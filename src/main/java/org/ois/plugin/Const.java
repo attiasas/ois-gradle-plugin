@@ -34,20 +34,24 @@ public class Const {
     public static class Tasks {
         /** The 'Clean Cache' task name **/
         public static final String CLEAN_CACHES_TASK_NAME = "cleanSimulationEnv";
-        /** The 'Clean Cache' description **/
+        /** The 'Clean Cache' task description **/
         public static final String CLEAN_CACHES_TASK_DESCRIPTION = "Clean all cached items in OIS environment";
         /** The 'Validate OIS Project' task name **/
         public static final String VALIDATE_PROJECT_TASK_NAME = "validateProject";
-        /** The 'Validate OIS Project' description **/
+        /** The 'Validate OIS Project' task description **/
         public static final String VALIDATE_PROJECT_TASK_DESCRIPTION = "Validate that all the needed OIS project configurations are valid";
         /** The 'Prepare Simulation' task name **/
         public static final String PREPARE_SIMULATION_TASK_NAME = "prepareSimulation";
-        /** The 'Prepare Simulation' description **/
+        /** The 'Prepare Simulation' task description **/
         public static final String PREPARE_SIMULATION_TASK_DESCRIPTION = "Prepare the simulation environment to use the project";
         /** The 'Run HTML Simulation' task name **/
         public static final String RUN_HTML_SIMULATION_TASK_NAME = "runHtml";
-        /** The 'Run HTML Simulation' description **/
+        /** The 'Run HTML Simulation' task description **/
         public static final String RUN_HTML_SIMULATION_TASK_DESCRIPTION = "Run the simulation as html (In dev mode), will be hosted at http://localhost:8080/";
+        /** The 'Distribute Simulation task name **/
+        public static final String DISTRIBUTE_SIMULATION_TASK_NAME = "export";
+        /** The 'Distribute Simulation task description **/
+        public static final String DISTRIBUTE_SIMULATION_TASK_DESCRIPTION = "Generate the simulation production artifacts, ready for distribution at './build/ois/distribution'";
     }
 
 }

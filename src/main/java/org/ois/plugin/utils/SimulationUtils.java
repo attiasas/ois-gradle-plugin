@@ -45,12 +45,21 @@ public class SimulationUtils {
     }
 
     /**
-     * Get the 'assets' directory path, contains all the final generated and packed resources of the project simulation.
+     * Get the 'resources' directory path, contains all the needed files for the simulation and the assets of the project simulation.
+     * @param project - the OIS project
+     * @return the path to its 'resources' directory
+     */
+    public static Path getSimulationResourcesDirectory(Project project) {
+        return getSimulationDirectory(project).resolve("resources");
+    }
+
+    /**
+     * Get the 'assets' directory path, contains all the assets of the project simulation.
      * @param project - the OIS project
      * @return the path to its 'assets' directory
      */
     public static Path getSimulationAssetsDirectory(Project project) {
-        return getSimulationDirectory(project).resolve("assets");
+        return getSimulationResourcesDirectory(project).resolve("assets");
     }
 
     /**
@@ -60,6 +69,15 @@ public class SimulationUtils {
      */
     public static Path getSimulationRunnersDirectory(Project project) {
         return getSimulationDirectory(project).resolve("runners");
+    }
+
+    /**
+     * Get the 'distribution' directory path, contains all the generated production artifacts of the simulation
+     * @param project - the OIS project
+     * @return the path to its 'distribution' directory
+     */
+    public static Path getSimulationDistributionDirectory(Project project) {
+        return getSimulationDirectory(project).resolve("distribution");
     }
 
     /**
@@ -114,12 +132,7 @@ public class SimulationUtils {
      * @return map of environment variables used to execute 'Run simulation' task in the runner project
      */
     public static Map<String, String> getRunSimulationTaskEnvVariables(Project project) {
-        Map<String, String> env = new HashMap<>();
-        Path customSimulationDirPath = PluginConfiguration.getCustomSimulationDirPath(project);
-        if (customSimulationDirPath != null) {
-            env.put(RunnerConfiguration.ENV_PROJECT_ASSETS_PATH, customSimulationDirPath.toAbsolutePath().toString());
-        }
-        return env;
+        return getDistributeSimulationTaskEnvVariables(project);
     }
 
     /**
@@ -148,6 +161,20 @@ public class SimulationUtils {
     }
 
     /**
+     * Get the simulation runner expected environment variables required by the runners project to 'Distribute' a simulation.
+     * @param project - the project to get its configurations and generate the env vars.
+     * @return map of environment variables used to execute 'Distribute simulation' task in the runner project
+     */
+    public static Map<String, String> getDistributeSimulationTaskEnvVariables(Project project) {
+        Map<String, String> env = new HashMap<>();
+        Path customSimulationDirPath = PluginConfiguration.getCustomSimulationDirPath(project);
+        if (customSimulationDirPath != null) {
+            env.put(RunnerConfiguration.ENV_PROJECT_ASSETS_PATH, customSimulationDirPath.toAbsolutePath().toString());
+        }
+        return env;
+    }
+
+    /**
      * Get the simulation 'Distribute' gradle tasks base on the given platform
      * @param platform - the platform (runner type project) to get its 'Distribution' gradle tasks
      * @return - the tasks to preform in order to 'Distribute' simulation on the given platform
@@ -155,9 +182,20 @@ public class SimulationUtils {
     public static String[] getRunnerDistributionGradleTasks(RunnerConfiguration.RunnerType platform) {
         switch (platform) {
             case Html -> {
-                return new String[]{"dist"};
+                return new String[]{"build"};
             }
             default -> throw new RuntimeException("Unsupported platform type '" + platform + "'");
         }
+    }
+
+    /**
+     * Execute the 'Distribute Simulation' gradle task for a given project using an ois-runner
+     * @param project - the OIS project to run its simulation
+     * @param platform - the platform (ois-runner type) to run the simulation on
+     * @param envVariables - the extra environment variables used in the task process
+     */
+    public static void distributeSimulation(Project project, RunnerConfiguration.RunnerType platform, Map<String, String> envVariables) {
+        envVariables.putAll(System.getenv());
+        GradleUtils.runTasks(getRunner(project).workingDirectory, envVariables, log, getRunnerDistributionGradleTasks(platform));
     }
 }

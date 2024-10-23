@@ -48,5 +48,6 @@ public class SimulationPlugin implements Plugin<Project> {
         TaskProvider<PrepareSimulationTask> prepareSimulationTask = TaskUtils.addPrepareSimulationTask(target, validationTask);
 
         TaskUtils.addRunHtmlSimulationTask(target, prepareSimulationTask);
+        TaskUtils.addDistributeSimulationTask(target, prepareSimulationTask);
     }
 }

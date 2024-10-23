@@ -5,10 +5,7 @@ import org.gradle.api.Task;
 import org.gradle.api.UnknownTaskException;
 import org.gradle.api.tasks.TaskProvider;
 import org.ois.plugin.Const;
-import org.ois.plugin.tasks.PrepareSimulationTask;
-import org.ois.plugin.tasks.RunHtmlSimulationTask;
-import org.ois.plugin.tasks.ValidateProjectTask;
-import org.ois.plugin.tasks.CleanCachesTask;
+import org.ois.plugin.tasks.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,19 +60,6 @@ public class TaskUtils {
     }
 
     /**
-     * Register Clean-Cache task to the project if not already registered.
-     * Delete ois plugin caches
-     * @param project - the project to register the task to
-     */
-    public static void addCleanTask(Project project) {
-        try {
-            project.getTasks().named(Const.Tasks.CLEAN_CACHES_TASK_NAME, CleanCachesTask.class);
-            return;
-        } catch (UnknownTaskException ignored) {}
-        registerTaskInProject(Const.Tasks.CLEAN_CACHES_TASK_NAME, CleanCachesTask.class, Const.Tasks.CLEAN_CACHES_TASK_DESCRIPTION, project);
-    }
-
-    /**
      * Register OIS-Prepare-Simulation task to the project if not already registered.
      * Prepare the environment required for the OIS simulation actions
      * @param project - the project to register the task to
@@ -88,5 +72,33 @@ public class TaskUtils {
         } catch (UnknownTaskException ignored) {}
         TaskProvider<RunHtmlSimulationTask> task = registerTaskInProject(Const.Tasks.RUN_HTML_SIMULATION_TASK_NAME, RunHtmlSimulationTask.class, Const.Tasks.RUN_HTML_SIMULATION_TASK_DESCRIPTION, project);
         task.configure(runSimulationTask -> runSimulationTask.dependsOn(prepareSimulationTask));
+    }
+
+    /**
+     * Register Distribute-Simulation task to the project if not already registered.
+     * Generate the production artifacts for each configured platforms, ready to distribute.
+     * @param project - the project to register the task to
+     * @param prepareSimulationTask - the required task before this
+     */
+    public static void addDistributeSimulationTask(Project project, TaskProvider<PrepareSimulationTask> prepareSimulationTask) {
+        try {
+            project.getTasks().named(Const.Tasks.DISTRIBUTE_SIMULATION_TASK_NAME, DistributeSimulationTask.class);
+            return;
+        } catch (UnknownTaskException ignored) {}
+        TaskProvider<DistributeSimulationTask> task = registerTaskInProject(Const.Tasks.DISTRIBUTE_SIMULATION_TASK_NAME, DistributeSimulationTask.class, Const.Tasks.DISTRIBUTE_SIMULATION_TASK_DESCRIPTION, project);
+        task.configure(distributeTask -> distributeTask.dependsOn(prepareSimulationTask));
+    }
+
+    /**
+     * Register Clean-Cache task to the project if not already registered.
+     * Delete ois plugin caches
+     * @param project - the project to register the task to
+     */
+    public static void addCleanTask(Project project) {
+        try {
+            project.getTasks().named(Const.Tasks.CLEAN_CACHES_TASK_NAME, CleanCachesTask.class);
+            return;
+        } catch (UnknownTaskException ignored) {}
+        registerTaskInProject(Const.Tasks.CLEAN_CACHES_TASK_NAME, CleanCachesTask.class, Const.Tasks.CLEAN_CACHES_TASK_DESCRIPTION, project);
     }
 }

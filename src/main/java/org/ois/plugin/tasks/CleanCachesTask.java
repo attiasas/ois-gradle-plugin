@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 
-import org.ois.core.utils.FileUtils;
+import org.ois.core.utils.io.FileUtils;
 
 /**
  * Clean up the 'ois' directory in the project 'build' directory.
@@ -43,9 +43,13 @@ public class CleanCachesTask extends DefaultTask {
         if (oisRunnersDirPath.toFile().exists() && FileUtils.deleteDirectoryContent(oisRunnersDirPath) && oisRunnersDirPath.toFile().delete()) {
             log.info("Deleted cached runners directory.");
         }
-        Path oisAssetsDirPath = SimulationUtils.getSimulationAssetsDirectory(project);
+        Path oisAssetsDirPath = SimulationUtils.getSimulationResourcesDirectory(project);
         if (oisAssetsDirPath.toFile().exists() && FileUtils.deleteDirectoryContent(oisAssetsDirPath) && oisAssetsDirPath.toFile().delete()) {
             log.info("Deleted generated assets directory");
+        }
+        Path oisDistributionDirPath = SimulationUtils.getSimulationDistributionDirectory(project);
+        if (oisDistributionDirPath.toFile().exists() && FileUtils.deleteDirectoryContent(oisDistributionDirPath) && oisDistributionDirPath.toFile().delete()) {
+            log.info("Deleted generated distribution artifacts");
         }
     }
 }
