@@ -43,7 +43,7 @@ public class CleanCachesTask extends DefaultTask {
         if (oisRunnersDirPath.toFile().exists() && FileUtils.deleteDirectoryContent(oisRunnersDirPath) && oisRunnersDirPath.toFile().delete()) {
             log.info("Deleted cached runners directory.");
         }
-        Path oisAssetsDirPath = SimulationUtils.getSimulationResourcesDirectory(project);
+        Path oisAssetsDirPath = SimulationUtils.getSimulationRunnersResourcesDirectory(project);
         if (oisAssetsDirPath.toFile().exists() && FileUtils.deleteDirectoryContent(oisAssetsDirPath) && oisAssetsDirPath.toFile().delete()) {
             log.info("Deleted generated assets directory");
         }

@@ -32,7 +32,7 @@ public class SimulationPlugin implements Plugin<Project> {
         // Assert Project Java version is compatible
         String javaVersion = JavaVersion.current().toString();
         if (!new Version(javaVersion).isAtLeast(Const.Versions.MIN_JAVA_VERSION)) {
-            throw new GradleException("Java version 15 or higher is required. (version = " + javaVersion + ")");
+            throw new GradleException("Java version " + Const.Versions.MIN_JAVA_VERSION + " or higher is required. (version = " + javaVersion + ")");
         }
     }
 

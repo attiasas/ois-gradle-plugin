@@ -2,9 +2,12 @@ package org.ois.plugin.tasks;
 
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
+import org.ois.core.project.SimulationManifest;
 import org.ois.core.runner.RunnerConfiguration;
 import org.ois.core.utils.io.FileUtils;
 import org.ois.core.utils.io.ZipUtils;
+import org.ois.core.utils.io.data.formats.JsonFormat;
+import org.ois.plugin.PluginConfiguration;
 import org.ois.plugin.utils.SimulationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Set;
 
 /**
  * Generate the production artifacts of the project simulation for each of the configured platforms, ready for distribution.
@@ -26,12 +30,22 @@ public class DistributeSimulationTask extends DefaultTask {
      */
     @TaskAction
     public void generateProductionArtifacts() throws IOException {
-        Path distributionDirPath = SimulationUtils.getSimulationDistributionDirectory(getProject());
-        if (FileUtils.createDirIfNotExists(distributionDirPath, true)) {
-            log.info("Created ois 'distribution' directory");
-        }
         log.info("Generating distribution artifacts");
-        generateHtmlArtifacts(distributionDirPath);
+        Path distributionDirPath = PluginConfiguration.getCustomExportDirPath(getProject());
+        if (distributionDirPath == null) {
+            distributionDirPath = SimulationUtils.getSimulationDistributionDirectory(getProject());
+            if (FileUtils.createDirIfNotExists(distributionDirPath, true)) {
+                log.info("Created ois 'distribution' directory");
+            }
+        } else {
+            log.info("Using custom export directory {}", distributionDirPath);
+        }
+        SimulationManifest manifest = SimulationUtils.getSimulationManifest(getProject());
+        Set<RunnerConfiguration.RunnerType> platforms = manifest.getPlatforms();
+        if (platforms.contains(RunnerConfiguration.RunnerType.Html)) {
+            log.info("Exporting HTML artifacts");
+            generateHtmlArtifacts(distributionDirPath);
+        }
     }
 
     /**
@@ -55,7 +69,7 @@ public class DistributeSimulationTask extends DefaultTask {
      * @return - list of files and directories to zip
      */
     private Path[] getHtmlFilesToZip() {
-        Path webappDir = SimulationUtils.getRunner(getProject()).workingDirectory.resolve("html-runner").resolve("build").resolve("dist").resolve("webapp");
+        Path webappDir = SimulationUtils.getRunner(getProject()).getHtmlRunnerDirectory().resolve("build").resolve("dist").resolve("webapp");
         File[] files = webappDir.toFile().listFiles();
         if (files == null || files.length == 0) {
             throw new RuntimeException("[HTML] Can't find any artifacts to zip");

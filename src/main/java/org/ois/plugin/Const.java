@@ -18,11 +18,11 @@ public class Const {
          /** Default version of the 'ois-runners' repository to be used. **/
         public static final String OIS_RUNNERS_VERSION = "main";
          /** Default version of the 'ois-core' library to be used. **/
-        public static final String OIS_CORE_VERSION = "0.1-SNAPSHOT";
+        public static final Version OIS_CORE_VERSION = new Version("0.1-SNAPSHOT");
     }
 
     /** The name of the extension object to configure the plugin **/
-    public static final String PLUGIN_EXTENSION_NAME = "oisConfigurations";
+    public static final String PLUGIN_EXTENSION_NAME = "simulation";
     /** The name of the group the plugin tasks **/
     public static final String PLUGIN_GROUP_NAME = "ois";
     /** The URL of the runners repository that will be used to run the simulation **/

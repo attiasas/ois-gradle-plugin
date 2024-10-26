@@ -5,18 +5,25 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
 import org.gradle.api.tasks.TaskAction;
+import org.ois.core.project.Assets;
+import org.ois.core.project.SimulationManifest;
+import org.ois.core.runner.RunnerConfiguration;
 import org.ois.core.utils.io.FileUtils;
+import org.ois.core.utils.io.data.formats.JsonFormat;
 import org.ois.plugin.Const;
+import org.ois.plugin.PluginConfiguration;
 import org.ois.plugin.utils.GitUtils;
+import org.ois.plugin.utils.HtmlUtils;
 import org.ois.plugin.utils.SimulationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Set;
+import java.util.Hashtable;
+import java.util.Map;
 
 /**
  * Make sure the needed components for the deployer are ready to be used for running/debugging/exporting the OIS project
@@ -37,58 +44,96 @@ public class PrepareSimulationTask extends DefaultTask {
         }
         Path oisSimulationDirPath = SimulationUtils.getSimulationDirectory(getProject());
         if (FileUtils.createDirIfNotExists(oisSimulationDirPath, true)) {
-            log.info("Created project simulation directory");
+            log.debug("Created project simulation directory");
         }
-        prepareRunners(getProject());
-        prepareResources(getProject());
+        SimulationUtils.SimulationRunner runner = prepareRunners(getProject());
+        SimulationManifest manifest = prepareResources(getProject());
+        // Prepare Html extra steps
+        if (manifest.getPlatforms().contains(RunnerConfiguration.RunnerType.Html)) {
+            log.debug("Prepare html resources...");
+            prepareHtmlResources(getProject(), runner, manifest);
+        }
         log.info("Simulation environment is ready");
     }
 
-    private void prepareRunners(Project project) throws IOException, GitAPIException {
+    private SimulationUtils.SimulationRunner prepareRunners(Project project) throws IOException, GitAPIException {
         Path oisRunnersDirPath = SimulationUtils.getSimulationRunnersDirectory(project);
         if (FileUtils.createDirIfNotExists(oisRunnersDirPath, true)) {
-            log.info("Created simulation runners directory");
+            log.debug("Created simulation runners directory");
         }
         SimulationUtils.SimulationRunner runner = SimulationUtils.getRunner(project);
         if (FileUtils.createDirIfNotExists(runner.workingDirectory, true)) {
-            log.info("Created simulation runner '{}' directory {}", runner.version, runner.workingDirectory);
+            log.debug("Created simulation runner '{}' directory {}", runner.version, runner.workingDirectory);
             if (!runner.isCustom()) {
                 // Fetch runner only if not exists in project cache
                 try (Git git = GitUtils.cloneRepoByTag(Const.OIS_RUNNERS_GIT_REPO_URL, runner.version, runner.workingDirectory)) {
-                    log.info("Runner content downloaded successfully");
+                    log.debug("Runner content downloaded successfully");
                 }
             }
         }
         if (runner.isCustom()) {
             // Always copy custom source dir
             FileUtils.copyDirectoryContent(runner.customSourceDir, runner.workingDirectory, "**/*.git*/**");
-            log.info("Runner custom content copied successfully");
+            log.debug("Runner custom content copied successfully");
         }
-        log.info("Using simulation runner version '{}'", runner.version);
+        log.info("Using simulation runner: {}", runner);
+        return runner;
     }
 
-    private void prepareResources(Project project) throws IOException {
-        Path oisResourcesDirPath = SimulationUtils.getSimulationResourcesDirectory(project);
+    private SimulationManifest prepareResources(Project project) throws IOException {
+        Path oisResourcesDirPath = SimulationUtils.getSimulationRunnersResourcesDirectory(project);
         if (FileUtils.createDirIfNotExists(oisResourcesDirPath, true)) {
-            log.info("Created ois simulation 'resources' directory");
+            log.debug("Created ois simulation 'resources' directory");
         }
-//        log.info("Copy project Jar files...");
-//        for (Path jarPath : getProjectJars()) {
-//            FileUtils.copyFile(jarPath, oisResourcesDirPath, true);
-//            log.debug("Copied {}", jarPath);
-//        }
         log.info("Copy project simulation resources...");
-        FileUtils.copyDirectoryContent(SimulationUtils.getProjectRawAssetsDirectory(project), oisResourcesDirPath);
+        // Copy project assets
+        Path projectSimulationDir = PluginConfiguration.getCustomSimulationDirPath(project);
+        if (projectSimulationDir == null) {
+            projectSimulationDir = SimulationUtils.getProjectSimulationConfigDirectory(project);
+        }
+        log.debug("Project simulation directory: {}", projectSimulationDir);
+        Path projectAssetsDir = projectSimulationDir.resolve(Assets.ASSETS_DIRECTORY);
+        if (projectAssetsDir.toFile().exists() && projectAssetsDir.toFile().isDirectory()) {
+            log.debug("'assets' directory located, copy content");
+            FileUtils.copyDirectoryContent(projectAssetsDir, SimulationUtils.getSimulationRunnersAssetsDirectory(project));
+        }
+        // Create simulation manifest that will be used by runners
+        SimulationManifest manifest = createManifest(projectSimulationDir);
+        String manifestData = JsonFormat.humanReadable().serialize(manifest);
+        log.debug("Runners simulation manifest:\n{}", manifestData);
+        Files.writeString(SimulationUtils.getSimulationRunnersManifestFile(project), manifestData);
+        return manifest;
     }
 
-//    public Path[] getProjectJars() {
-//        Set<File> jarFiles = getProject().getTasks().getByName("jar").getOutputs().getFiles().getFiles();
-//        if (jarFiles.isEmpty()) {
-//            log.warn("Can't find simulation project jars to deploy into the runners");
-//            return new Path[]{};
-//        }
-//        Path[] paths = jarFiles.stream().map(File::toPath).toArray(Path[]::new);
-//        log.debug("Using Jars: {}", Arrays.toString(paths));
-//        return paths;
-//    }
+    private SimulationManifest createManifest(Path projectSimulationDir) throws IOException {
+        try (InputStream in = Files.newInputStream(projectSimulationDir)) {
+            return JsonFormat.humanReadable().load(new SimulationManifest(), in);
+        }
+    }
+
+    private void prepareHtmlResources(Project project, SimulationUtils.SimulationRunner runner, SimulationManifest manifest) throws IOException {
+        // Attributes to inject
+        Map<String, Object> htmlSimulationConfigFileAttributes = new Hashtable<>(Map.of(
+                "TITLE", manifest.getTitle(),
+                "SCREEN_WIDTH", manifest.getScreenWidth(),
+                "SCREEN_HEIGHT", manifest.getScreenHeight(),
+                "LOG_LEVEL", PluginConfiguration.getLogLevel(project)
+        ));
+        String[] logTopics = PluginConfiguration.getLogTopics(project);
+        if (logTopics != null) {
+            htmlSimulationConfigFileAttributes.put("LOG_TOPICS", logTopics);
+        }
+        // Generate new content with injected values
+        String updatedContent = HtmlUtils.getUpdateConfigFileContent(HtmlUtils.getSimulationConfigContent(runner.getHtmlRunnerDirectory()), htmlSimulationConfigFileAttributes);
+        log.debug("Replacing 'SimulationConfig.java' content at runner directory with the project config:\n{}", updatedContent);
+        // Save
+        Files.writeString(HtmlUtils.getSimulationConfigPath(runner.getHtmlRunnerDirectory()), updatedContent);
+        log.debug("Generating Reflection items file content");
+        String reflectionsContent = HtmlUtils.generateReflectionFileContent(project);
+        if (reflectionsContent.isBlank()) {
+            log.debug("No items to reflect");
+            return;
+        }
+        Files.writeString(HtmlUtils.getReflectionsItemsFilePath(project), reflectionsContent);
+    }
 }

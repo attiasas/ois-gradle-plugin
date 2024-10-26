@@ -20,11 +20,11 @@ public class ValidateProjectTask extends DefaultTask {
     public void validateProject() {
         log.info("Validate project simulation configurations");
         // Check if 'simulation' directory exists in the project
-        if (!SimulationUtils.getProjectRawAssetsDirectory(getProject()).toFile().exists()) {
+        if (!SimulationUtils.getProjectSimulationConfigDirectory(getProject()).toFile().exists()) {
             throw new RuntimeException("Can't find 'simulation' directory in the project directory " + getProject().getProjectDir());
         }
         // Check if 'simulation.ois' file exists
-        if(!SimulationUtils.getProjectRawAssetsDirectory(getProject()).resolve(SimulationManifest.DEFAULT_FILE_NAME).toFile().exists()) {
+        if(!SimulationUtils.getProjectSimulationConfigDirectory(getProject()).resolve(SimulationManifest.DEFAULT_FILE_NAME).toFile().exists()) {
             throw new RuntimeException("Can't find 'simulation.ois' manifest file at the project 'simulation' directory");
         }
     }

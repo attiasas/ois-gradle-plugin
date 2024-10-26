@@ -1,12 +1,18 @@
 package org.ois.plugin.utils;
 
 import org.gradle.api.Project;
+import org.ois.core.project.Assets;
+import org.ois.core.project.SimulationManifest;
 import org.ois.core.runner.RunnerConfiguration;
+import org.ois.core.utils.io.data.formats.JsonFormat;
 import org.ois.plugin.Const;
 import org.ois.plugin.PluginConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +28,7 @@ public class SimulationUtils {
      * @param project - the OIS project
      * @return the path to its 'simulation' directory
      */
-    public static Path getProjectRawAssetsDirectory(Project project) {
+    public static Path getProjectSimulationConfigDirectory(Project project) {
         return project.getProjectDir().toPath().resolve("simulation");
     }
 
@@ -49,7 +55,7 @@ public class SimulationUtils {
      * @param project - the OIS project
      * @return the path to its 'resources' directory
      */
-    public static Path getSimulationResourcesDirectory(Project project) {
+    public static Path getSimulationRunnersResourcesDirectory(Project project) {
         return getSimulationDirectory(project).resolve("resources");
     }
 
@@ -58,8 +64,12 @@ public class SimulationUtils {
      * @param project - the OIS project
      * @return the path to its 'assets' directory
      */
-    public static Path getSimulationAssetsDirectory(Project project) {
-        return getSimulationResourcesDirectory(project).resolve("assets");
+    public static Path getSimulationRunnersAssetsDirectory(Project project) {
+        return getSimulationRunnersResourcesDirectory(project).resolve(Assets.ASSETS_DIRECTORY);
+    }
+
+    public static Path getSimulationRunnersManifestFile(Project project) {
+        return getSimulationRunnersResourcesDirectory(project).resolve(SimulationManifest.DEFAULT_FILE_NAME);
     }
 
     /**
@@ -78,6 +88,15 @@ public class SimulationUtils {
      */
     public static Path getSimulationDistributionDirectory(Project project) {
         return getSimulationDirectory(project).resolve("distribution");
+    }
+
+    /** for tasks after Prepare, gets the actual simulation manifest in the runner that will be used **/
+    public static SimulationManifest getSimulationManifest(Project project) throws IOException {
+        // in the project build dir
+        Path manifestPath = getSimulationRunnersManifestFile(project);
+        try (InputStream in = Files.newInputStream(manifestPath)) {
+            return JsonFormat.humanReadable().load(new SimulationManifest(), in);
+        }
     }
 
     /**
@@ -114,6 +133,17 @@ public class SimulationUtils {
          */
         public boolean isCustom() {
             return this.customSourceDir != null;
+        }
+
+        public Path getHtmlRunnerDirectory() { return this.workingDirectory.resolve("html-runner"); }
+
+        @Override
+        public String toString() {
+            return "SimulationRunner{" +
+                    "workingDirectory=" + workingDirectory +
+                    ", version='" + version + '\'' +
+                    ", customSourceDir=" + customSourceDir +
+                    '}';
         }
     }
 
@@ -167,10 +197,6 @@ public class SimulationUtils {
      */
     public static Map<String, String> getDistributeSimulationTaskEnvVariables(Project project) {
         Map<String, String> env = new HashMap<>();
-        Path customSimulationDirPath = PluginConfiguration.getCustomSimulationDirPath(project);
-        if (customSimulationDirPath != null) {
-            env.put(RunnerConfiguration.ENV_PROJECT_ASSETS_PATH, customSimulationDirPath.toAbsolutePath().toString());
-        }
         return env;
     }
 
