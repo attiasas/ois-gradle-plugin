@@ -44,7 +44,7 @@ public class DistributeSimulationTask extends DefaultTask {
         Set<RunnerConfiguration.RunnerType> platforms = manifest.getPlatforms();
         if (platforms.contains(RunnerConfiguration.RunnerType.Html)) {
             log.info("Exporting HTML artifacts");
-            generateHtmlArtifacts(distributionDirPath);
+            generateHtmlArtifacts(manifest, distributionDirPath);
         }
     }
 
@@ -53,14 +53,14 @@ public class DistributeSimulationTask extends DefaultTask {
      * @param distributionDirPath - the directory to generate
      * @throws IOException - in case of errors in generation
      */
-    public void generateHtmlArtifacts(Path distributionDirPath) throws IOException {
+    public void generateHtmlArtifacts(SimulationManifest manifest, Path distributionDirPath) throws IOException {
         Path htmlDistDirPath = distributionDirPath.resolve(RunnerConfiguration.RunnerType.Html.name());
         if (FileUtils.createDirIfNotExists(htmlDistDirPath, true)) {
             log.info("Created html distribution directory");
         }
         SimulationUtils.distributeSimulation(getProject(), RunnerConfiguration.RunnerType.Html, SimulationUtils.getDistributeSimulationTaskEnvVariables(getProject()));
         log.info("[HTML] Collect artifacts...");
-        ZipUtils.zipItems(htmlDistDirPath.resolve("projectName.zip"), getHtmlFilesToZip());
+        ZipUtils.zipItems(htmlDistDirPath.resolve(manifest.getTitle() + ".zip"), getHtmlFilesToZip());
         log.info("[HTML] Artifacts generated successfully");
     }
 

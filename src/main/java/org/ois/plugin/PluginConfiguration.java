@@ -221,13 +221,13 @@ public class PluginConfiguration {
         return simulationDir.exists() && simulationDir.isDirectory() ? simulationDir.toPath() : null;
     }
 
-    public static ILogger.Level getLogLevel(Project project) {
+    public static String getLogLevel(Project project) {
         PluginConfiguration extension = getPluginConfigurations(project);
         String logLevel = extension.getLogLevel();
         if (logLevel == null || logLevel.trim().isEmpty()) {
-            return ILogger.Level.Info;
+            return ILogger.Level.Info.name();
         }
-        return ILogger.toLogLevel(logLevel);
+        return logLevel;
     }
 
     public static String[] getLogTopics(Project project) {

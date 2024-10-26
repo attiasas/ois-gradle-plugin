@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -106,8 +107,18 @@ public class PrepareSimulationTask extends DefaultTask {
     }
 
     private SimulationManifest createManifest(Path projectSimulationDir) throws IOException {
-        try (InputStream in = Files.newInputStream(projectSimulationDir)) {
-            return JsonFormat.humanReadable().load(new SimulationManifest(), in);
+        try (InputStream in = Files.newInputStream(projectSimulationDir.resolve(SimulationManifest.DEFAULT_FILE_NAME))) {
+            SimulationManifest manifest = JsonFormat.humanReadable().load(new SimulationManifest(), in);
+
+            if (manifest.getTitle().isBlank()) {
+                manifest.setTitle("OIS");
+            }
+
+            if (manifest.getPlatforms().isEmpty()) {
+                manifest.getPlatforms().addAll(List.of(RunnerConfiguration.RunnerType.values()));
+            }
+
+            return manifest;
         }
     }
 
