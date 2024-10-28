@@ -30,9 +30,13 @@ jobs:
           distribution: "corretto"
           java-version: "11"
 
+      - name: Give permission to gradlew
+        run: chmod +x gradlew
+        if: runner.os != 'Windows'
+
       - name: SetUp ois-core
         run: |
-          git clone --branch ${{ matrix.branch }} https://github.com/attiasas/ois-core.git
+          git clone https://github.com/attiasas/ois-core.git --branch ${{ matrix.branch }}
           cd ois-core
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
             ./gradlew.bat publishToMavenLocal
@@ -83,9 +87,13 @@ jobs:
           distribution: "corretto"
           java-version: "11"
 
+      - name: Give permission to gradlew
+        run: chmod +x gradlew
+        if: runner.os != 'Windows'
+
       - name: SetUp ois-core
         run: |
-          git clone --branch ${{ matrix.branch }} https://github.com/attiasas/ois-core.git
+          git clone https://github.com/attiasas/ois-core.git --branch ${{ matrix.branch }}
           cd ois-core
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
             ./gradlew.bat publishToMavenLocal
