@@ -12,41 +12,54 @@ import java.nio.file.Path;
 import org.ois.core.utils.io.FileUtils;
 
 /**
- * Clean up the 'ois' directory in the project 'build' directory.
- * Mostly used for developing or when issues occurs.
+ * Task to clean up the OIS cache directories in the project's 'build' directory.
+ * This is typically useful when developing or resolving issues with the simulation.
  */
 public class CleanCachesTask extends DefaultTask {
     private static final Logger log = LoggerFactory.getLogger(CleanCachesTask.class);
 
     /**
-     * Default constructor
+     * Default constructor for the clean cache task.
      */
-    public CleanCachesTask(){super();}
+    public CleanCachesTask() {
+        super();
+    }
 
     /**
-     * Clean up OIS cache directories in the project 'build' directory
+     * Cleans up the OIS cache directories in the project 'build' directory.
+     * This includes removing cache files related to OIS runners, assets, and distribution artifacts.
+     * If the directories do not exist, appropriate log messages will be displayed.
      */
     @TaskAction
     public void cleanCache() {
         log.info("Clean OIS cache items");
         Project project = getProject();
+
+        // Check if the build directory exists
         if (!SimulationUtils.getProjectBuildDirectory(project).toFile().exists()) {
             log.info("Project 'build' directory not exists, Nothing to do.");
             return;
         }
+
+        // Check if the OIS directory exists
         if (!SimulationUtils.getSimulationDirectory(project).toFile().exists()) {
             log.info("OIS directory not exists in project 'build' directory, Nothing to do.");
             return;
         }
-        // Clean
+
+        // Clean runners cache
         Path oisRunnersDirPath = SimulationUtils.getSimulationRunnersDirectory(project);
         if (oisRunnersDirPath.toFile().exists() && FileUtils.deleteDirectoryContent(oisRunnersDirPath) && oisRunnersDirPath.toFile().delete()) {
             log.info("Deleted cached runners directory.");
         }
+
+        // Clean assets cache
         Path oisAssetsDirPath = SimulationUtils.getSimulationRunnersResourcesDirectory(project);
         if (oisAssetsDirPath.toFile().exists() && FileUtils.deleteDirectoryContent(oisAssetsDirPath) && oisAssetsDirPath.toFile().delete()) {
             log.info("Deleted generated assets directory");
         }
+
+        // Clean distribution artifacts
         Path oisDistributionDirPath = SimulationUtils.getSimulationDistributionDirectory(project);
         if (oisDistributionDirPath.toFile().exists() && FileUtils.deleteDirectoryContent(oisDistributionDirPath) && oisDistributionDirPath.toFile().delete()) {
             log.info("Deleted generated distribution artifacts");

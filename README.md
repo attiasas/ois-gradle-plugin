@@ -29,3 +29,35 @@ pluginManagement {
     }
 }
 ```
+
+<details>
+<summary> <h2><a href="https://github.com/attiasas/ois-core/wiki">Home</a></h2> </summary>
+
+* [Getting Started](https://github.com/attiasas/ois-core/wiki#getting-started)
+* [Developer's Guide](https://github.com/attiasas/ois-core/wiki#developers-guide)
+
+</details>
+
+---
+
+<details>
+<summary> <a href="https://github.com/attiasas/ois-core/wiki#getting-started">Getting Started</a> </summary>
+
+* [Setting Up a Dev Environment](https://github.com/attiasas/ois-core/wiki/Setting-Up-a-Dev-Environment)
+* [Configure Your Simulation Project](https://github.com/attiasas/ois-core/wiki/Configure-Your-Simulation-Project)
+* [Running and Debugging the Simulation](https://github.com/attiasas/ois-core/wiki/Running-and-Debugging-the-Simulation)
+* [Exporting the Simulation](https://github.com/attiasas/ois-core/wiki/Exporting-the-Simulation)
+
+</details>
+
+---
+
+<details>
+<summary> <a href="https://github.com/attiasas/ois-core/wiki#developers-guide">Developer's Guide</a> </summary>
+
+* [Managing States](https://github.com/attiasas/ois-core/wiki/Managing-States)
+* [Access Simulation Assets](https://github.com/attiasas/ois-core/wiki/Access-Simulation-Assets)
+
+</details>
+
+c

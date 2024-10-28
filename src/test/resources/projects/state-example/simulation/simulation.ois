@@ -1,0 +1,8 @@
+{
+  "initialState": "Blue",
+  "states": {
+    "Blue": "org.example.BlueState",
+    "Red": "org.example.RedState",
+    "Green": "org.example.GreenState"
+  }
+}

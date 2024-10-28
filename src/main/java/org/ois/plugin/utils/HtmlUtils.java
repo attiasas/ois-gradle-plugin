@@ -9,12 +9,27 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Utility class to handle HTML-specific functionalities for the OIS simulation.
+ * This includes generating file paths, reading and updating content for configuration files.
+ */
 public class HtmlUtils {
 
+    /**
+     * Gets the path to the reflections items file inside the OIS simulation directory.
+     * @param project The current Gradle project.
+     * @return The path to the reflection.ois file.
+     */
     public static Path getReflectionsItemsFilePath(Project project) {
         return SimulationUtils.getSimulationRunnersResourcesDirectory(project).resolve("reflection.ois");
     }
 
+    /**
+     * Generates the content of the reflections file. If the file does not exist, returns an empty string.
+     * @param project The current Gradle project.
+     * @return The content of the reflections file as a string, or an empty string if the file does not exist.
+     * @throws IOException if an I/O error occurs while reading the file.
+     */
     public static String generateReflectionFileContent(Project project) throws IOException {
         // check if exists
         Path reflectionItemsFilePath = getReflectionsItemsFilePath(project);
@@ -24,28 +39,37 @@ public class HtmlUtils {
         return "";
     }
 
+    /**
+     * Retrieves the content of the SimulationConfig.java file for the HTML runner.
+     * @param htmlRunnerDirectory The directory containing the HTML runner.
+     * @return The content of SimulationConfig.java as a string.
+     * @throws IOException if an I/O error occurs while reading the file.
+     */
     public static String getSimulationConfigContent(Path htmlRunnerDirectory) throws IOException {
         return Files.readString(getSimulationConfigPath(htmlRunnerDirectory));
     }
 
+    /**
+     * Gets the path to the SimulationConfig.java file for the HTML runner.
+     * @param htmlRunnerDirectory The directory containing the HTML runner.
+     * @return The path to SimulationConfig.java.
+     */
     public static Path getSimulationConfigPath(Path htmlRunnerDirectory) {
         return htmlRunnerDirectory.resolve("src").resolve("main").resolve("java").resolve("org").resolve("ois").resolve("html").resolve("SimulationConfig.java");
     }
 
     /**
-     * Main method to update the content of the SimulationConfig.java file.
-     * @param fileContent The original content of the SimulationConfig.java file as a string.
+     * Updates the content of SimulationConfig.java by replacing specific attributes with new values.
+     * @param fileContent The original content of the SimulationConfig.java file.
      * @param attributeMap A map where keys are attribute names and values are the new values.
      * @return The updated file content as a string.
-     * @throws IllegalArgumentException if an attribute in attributeMap is not found in the fileContent.
+     * @throws IllegalArgumentException if any attribute in the map was not found in the file.
      */
     public static String getUpdateConfigFileContent(String fileContent, Map<String, Object> attributeMap) {
         // Process each line to update existing attributes
         StringBuilder updatedContent = processLines(fileContent, attributeMap);
-
         // Check if any attributes in attributeMap were not found and replaced
         checkNotReplacedAttributes(attributeMap);
-
         return updatedContent.toString();
     }
 

@@ -19,6 +19,19 @@ repositories {
 dependencies {
     implementation "org.ois:open-interactive-simulation-core:$coreVersion"
     implementation 'org.eclipse.jgit:org.eclipse.jgit:6.10.0.202406032230-r'
+
+    testImplementation group: 'org.testng', name: 'testng', version: '7.7.0'
+}
+
+test {
+    useTestNG() {
+        useDefaultListeners = true
+    }
+    testLogging {
+        exceptionFormat "full"
+        events "started", "passed", "skipped", "failed", "standardOut", "standardError"
+        minGranularity 0
+    }
 }
 
 gradlePlugin {
