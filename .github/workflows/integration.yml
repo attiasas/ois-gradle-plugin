@@ -43,13 +43,22 @@ jobs:
           cd ..  # Return to the main project working directory
         shell: bash
 
+      - name: Publish Plugin to MavenLocal
+        run: |
+          if [[ ${{ matrix.os }} == "windows-latest" ]]; then
+            ./gradlew.bat publishToMavenLocal
+          else
+            chmod +x gradlew
+            ./gradlew publishToMavenLocal
+          fi
+        shell: bash
+
       - name: Run HTML Task on Project
         run: |
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
             Start-Process -NoNewWindow -FilePath ./gradlew.bat -ArgumentList "-p src\\test\\resources\\projects\\state-example runHtml" | Out-File -FilePath output.log -Append
             while (!(Select-String -Path output.log -Pattern "http://localhost:8080/")) { Start-Sleep -Seconds 5 }
           else
-            chmod +x gradlew
             ./gradlew -p src/test/resources/projects/state-example runHtml | tee output.log &
             while ! grep -q "http://localhost:8080/" output.log; do sleep 5; done
           fi
@@ -89,12 +98,21 @@ jobs:
           cd ..  # Return to the main project working directory
         shell: bash
 
+      - name: Publish Plugin to MavenLocal
+        run: |
+          if [[ ${{ matrix.os }} == "windows-latest" ]]; then
+            ./gradlew.bat publishToMavenLocal
+          else
+            chmod +x gradlew
+            ./gradlew publishToMavenLocal
+          fi
+        shell: bash
+
       - name: Run Export Task
         run: |
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
             ./gradlew.bat -p src\\test\\resources\\projects\\state-example export
           else
-            chmod +x gradlew
             ./gradlew -p src/test/resources/projects/state-example export
           fi
         shell: bash
