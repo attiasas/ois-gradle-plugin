@@ -171,13 +171,10 @@ public class SimulationUtils {
      * @return - the tasks to preform in order to 'Run' simulation on the given platform
      */
     public static String[] getRunnerRunSimulationGradleTasks(RunnerConfiguration.RunnerType platform) {
-        switch (platform) {
-            case Html -> {
-                return new String[]{"run"};
-            }
-            default -> {
-                throw new RuntimeException("Unsupported platform type '" + platform + "'");
-            }
+        if (RunnerConfiguration.RunnerType.Html.equals(platform)) {
+            return new String[]{"run"};
+        } else {
+            throw new RuntimeException("Unsupported platform type '" + platform + "'");
         }
     }
 
@@ -208,11 +205,10 @@ public class SimulationUtils {
      * @return - the tasks to preform in order to 'Distribute' simulation on the given platform
      */
     public static String[] getRunnerDistributionGradleTasks(RunnerConfiguration.RunnerType platform) {
-        switch (platform) {
-            case Html -> {
-                return new String[]{"build"};
-            }
-            default -> throw new RuntimeException("Unsupported platform type '" + platform + "'");
+        if (RunnerConfiguration.RunnerType.Html.equals(platform)) {
+            return new String[]{"build"};
+        } else {
+            throw new RuntimeException("Unsupported platform type '" + platform + "'");
         }
     }
 
