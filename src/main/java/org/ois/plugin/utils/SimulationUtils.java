@@ -175,7 +175,9 @@ public class SimulationUtils {
             case Html -> {
                 return new String[]{"run"};
             }
-            default -> throw new RuntimeException("Unsupported platform type '" + platform + "'");
+            default -> {
+                throw new RuntimeException("Unsupported platform type '" + platform + "'");
+            }
         }
     }
 

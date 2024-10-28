@@ -30,10 +30,6 @@ jobs:
           distribution: "corretto"
           java-version: "11"
 
-      - name: Give permission to gradlew
-        run: chmod +x gradlew
-        if: runner.os != 'Windows'
-
       - name: SetUp ois-core
         run: |
           git clone https://github.com/attiasas/ois-core.git --branch ${{ matrix.branch }}
@@ -41,27 +37,20 @@ jobs:
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
             ./gradlew.bat publishToMavenLocal
           else
+            chmod +x gradlew
             ./gradlew publishToMavenLocal
           fi
           cd ..  # Return to the main project working directory
         shell: bash
 
-      - name: Navigate to Test Project Directory
+      - name: Run HTML Task on Project
         run: |
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            cd src\\test\\resources\\projects\\state-example
-          else
-            cd src/test/resources/projects/state-example
-          fi
-        shell: bash
-
-      - name: Run HTML Task
-        run: |
-          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            ./gradlew.bat runHtml | tee output.log &
+            ./gradlew.bat -p src\\test\\resources\\projects\\state-example runHtml | tee output.log &
             while (!(Select-String -Path output.log -Pattern "http://localhost:8080/")) { Start-Sleep -Seconds 5 }
           else
-            ./gradlew runHtml | tee output.log &
+            chmod +x gradlew
+            ./gradlew -p src/test/resources/projects/state-example runHtml | tee output.log &
             while ! grep -q "http://localhost:8080/" output.log; do sleep 5; done
           fi
         shell: bash
@@ -87,10 +76,6 @@ jobs:
           distribution: "corretto"
           java-version: "11"
 
-      - name: Give permission to gradlew
-        run: chmod +x gradlew
-        if: runner.os != 'Windows'
-
       - name: SetUp ois-core
         run: |
           git clone https://github.com/attiasas/ois-core.git --branch ${{ matrix.branch }}
@@ -98,17 +83,19 @@ jobs:
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
             ./gradlew.bat publishToMavenLocal
           else
+            chmod +x gradlew
             ./gradlew publishToMavenLocal
           fi
           cd ..  # Return to the main project working directory
         shell: bash
 
-      - name: Navigate to Test Project Directory
+      - name: Run Export Task
         run: |
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            cd src\\test\\resources\\projects\\state-example
+            ./gradlew.bat -p src\\test\\resources\\projects\\state-example export
           else
-            cd src/test/resources/projects/state-example
+            chmod +x gradlew
+            ./gradlew -p src/test/resources/projects/state-example export
           fi
         shell: bash
 
@@ -124,13 +111,13 @@ jobs:
       - name: Check Files in Distribution Directory
         run: |
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            if (Test-Path -Path "build\\distribution\\html" -and (Get-ChildItem -Path "build\\distribution\\html" | Measure-Object).Count -gt 0) {
+            if (Test-Path -Path "src\\test\\resources\\projects\\state-example\\build\\distribution\\html" -and (Get-ChildItem -Path "src\\test\\resources\\projects\\state-example\\build\\distribution\\html" | Measure-Object).Count -gt 0) {
               Write-Output "Files were successfully created in build\\distribution\\html."
             } else {
               Write-Output "No files found in build\\distribution\\html" ; exit 1
             }
           else
-            if [ -d "build/distribution/html" ] && [ "$(ls -A build/distribution/html)" ]; then
+            if [ -d "src/test/resources/projects/state-example/build/distribution/html" ] && [ "$(ls -A src/test/resources/projects/state-example/build/distribution/html)" ]; then
               echo "Files were successfully created in build/distribution/html."
             else
               echo "No files found in build/distribution/html" && exit 1
