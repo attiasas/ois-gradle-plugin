@@ -48,6 +48,10 @@ public class Const {
         public static final String RUN_HTML_SIMULATION_TASK_NAME = "runHtml";
         /** The 'Run HTML Simulation' task description **/
         public static final String RUN_HTML_SIMULATION_TASK_DESCRIPTION = "Run the simulation as html (In dev mode), will be hosted at http://localhost:8080/";
+        /** The 'Run HTML Simulation' task name **/
+        public static final String RUN_DESKTOP_SIMULATION_TASK_NAME = "runDesktop";
+        /** The 'Run HTML Simulation' task description **/
+        public static final String RUN_DESKTOP_SIMULATION_TASK_DESCRIPTION = "Run the simulation (In dev mode) in a desktop window";
         /** The 'Distribute Simulation task name **/
         public static final String DISTRIBUTE_SIMULATION_TASK_NAME = "export";
         /** The 'Distribute Simulation task description **/

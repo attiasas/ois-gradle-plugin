@@ -14,7 +14,7 @@ public class RunHtmlSimulationTask extends DefaultTask {
     private static final Logger log = LoggerFactory.getLogger(RunHtmlSimulationTask.class);
 
     /**
-     * Generate tbe Html JS project from the project source, set up a Server at '<a href="http://localhost:8080/">localhost:8080</a>' to serve the Html simulation.
+     * Generate the Html JS project from the project source, set up a Server at '<a href="http://localhost:8080/">localhost:8080</a>' to serve the Html simulation.
      */
     @TaskAction
     public void runHtml() {

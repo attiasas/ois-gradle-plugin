@@ -60,7 +60,7 @@ public class TaskUtils {
     }
 
     /**
-     * Register OIS-Prepare-Simulation task to the project if not already registered.
+     * Register OIS-run-html-simulation task to the project if not already registered.
      * Prepare the environment required for the OIS simulation actions
      * @param project - the project to register the task to
      * @param prepareSimulationTask- the required task before this
@@ -71,6 +71,21 @@ public class TaskUtils {
             return;
         } catch (UnknownTaskException ignored) {}
         TaskProvider<RunHtmlSimulationTask> task = registerTaskInProject(Const.Tasks.RUN_HTML_SIMULATION_TASK_NAME, RunHtmlSimulationTask.class, Const.Tasks.RUN_HTML_SIMULATION_TASK_DESCRIPTION, project);
+        task.configure(runSimulationTask -> runSimulationTask.dependsOn(prepareSimulationTask));
+    }
+
+    /**
+     * Register OIS-run-desktop-simulation task to the project if not already registered.
+     * Prepare the environment required for the OIS simulation actions
+     * @param project - the project to register the task to
+     * @param prepareSimulationTask- the required task before this
+     */
+    public static void addRunDesktopSimulationTask(Project project, TaskProvider<PrepareSimulationTask> prepareSimulationTask) {
+        try {
+            project.getTasks().named(Const.Tasks.RUN_DESKTOP_SIMULATION_TASK_NAME, RunDesktopSimulationTask.class);
+            return;
+        } catch (UnknownTaskException ignored) {}
+        TaskProvider<RunDesktopSimulationTask> task = registerTaskInProject(Const.Tasks.RUN_DESKTOP_SIMULATION_TASK_NAME, RunDesktopSimulationTask.class, Const.Tasks.RUN_DESKTOP_SIMULATION_TASK_DESCRIPTION, project);
         task.configure(runSimulationTask -> runSimulationTask.dependsOn(prepareSimulationTask));
     }
 
