@@ -1,0 +1,86 @@
+name: "Project Integration Tests"
+
+on:
+  push:
+    branches:
+      - '**'
+    tags-ignore:
+      - '**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  export-state-example-project:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        branch: [main]  # Adjust branches/tags as needed
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "corretto"
+          java-version: "19"
+
+      - name: SetUp ois-core
+        run: |
+          git clone https://github.com/attiasas/ois-core.git --branch ${{ matrix.branch }}
+          cd ois-core
+          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            ./gradlew.bat publishToMavenLocal
+          else
+            chmod +x gradlew
+            ./gradlew publishToMavenLocal
+          fi
+          cd ..  # Return to the main project working directory
+        shell: bash
+
+      - name: Publish Plugin to MavenLocal
+        run: |
+          if [[ ${{ matrix.os }} == "windows-latest" ]]; then
+            ./gradlew.bat publishToMavenLocal
+          else
+            chmod +x gradlew
+            ./gradlew publishToMavenLocal
+          fi
+        shell: bash
+
+      - name: Run Export Task
+        run: |
+          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            ./gradlew.bat -p src\\test\\resources\\projects\\state-example export --info
+          else
+            ./gradlew -p src/test/resources/projects/state-example export --info
+          fi
+        shell: bash
+
+      - name: Check Files in Distribution Directory
+        run: |
+          dir_path="src/test/resources/projects/state-example/build/ois/distribution/Html"
+          # Check if the directory exists
+          if [ -d "$dir_path" ]; then
+            # Check if there are any files in the directory
+            if find "$dir_path" -type f -print -quit | grep -q .; then
+              # Check the OS and print directory contents accordingly
+              if [[ ${{ matrix.os }} == "windows-latest" ]]; then
+                echo "Listing files in $dir_path (Windows):"
+                dir "$dir_path"
+              else
+                echo "Listing files in $dir_path (Unix-like):"
+                ls -la "$dir_path"
+              fi
+            else
+              echo "No files found in the directory." && exit 1
+            fi
+          else
+            echo "Directory does not exist: $dir_path" && exit 1
+          fi
+        shell: bash

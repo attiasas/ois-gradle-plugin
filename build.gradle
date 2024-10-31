@@ -1,0 +1,86 @@
+plugins {
+    id 'com.gradle.plugin-publish' version "1.2.0"
+    id 'signing'
+}
+
+group 'org.ois'
+version '0.1-SNAPSHOT'
+var pluginDescription = "Adding this plugin to the project allows you to run and deploy OIS GUI simulations"
+
+ext {
+    coreVersion = '0.1-SNAPSHOT'
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    implementation "org.ois:open-interactive-simulation-core:$coreVersion"
+    implementation 'org.eclipse.jgit:org.eclipse.jgit:6.10.0.202406032230-r'
+
+    testImplementation group: 'org.testng', name: 'testng', version: '7.7.0'
+}
+
+test {
+    useTestNG() {
+        useDefaultListeners = true
+    }
+    testLogging {
+        exceptionFormat "full"
+        events "started", "passed", "skipped", "failed", "standardOut", "standardError"
+        minGranularity 0
+    }
+}
+
+
+gradlePlugin {
+    plugins {
+        SimulationDeployerPlugin {
+            id = 'org.ois.simulation'
+            displayName = "OIS Simulation Manager"
+            description = pluginDescription
+            implementationClass = 'org.ois.plugin.SimulationPlugin'
+        }
+    }
+}
+
+publishing {
+    publications {
+        pluginMaven(MavenPublication) {
+            pom {
+                name = rootProject.name
+                description = pluginDescription
+                url = 'https://github.com/attiasas/ois-gradle-plugin'
+
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = "attiasas"
+                        name = "Assaf Attias"
+                    }
+                }
+
+                scm {
+                    connection.set("scm:git:git://github.com/attiasas/ois-gradle-plugin.git")
+                    developerConnection.set("scm:git:git@github.com/attiasas/ois-gradle-plugin.git")
+                    url = "https://github.com/attiasas/ois-gradle-plugin"
+                }
+            }
+        }
+    }
+}
+
+signing {
+    required = project.hasProperty("sign")
+    var signingKey = findProperty("signingKey")
+    var signingPassword = findProperty("signingPassword")
+    useInMemoryPgpKeys(signingKey, signingPassword)
+}
