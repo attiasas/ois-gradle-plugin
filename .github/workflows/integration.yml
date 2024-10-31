@@ -67,15 +67,15 @@ jobs:
           # Base path for directories to check
           base_dir="src/test/resources/projects/state-example/build/ois/distribution"
           
-          # Define directory names with required minimum count (format: "dir_name:min_count")
+          # Define directory names with required minimum count (format: "dir_name:exact_count")
           dir_requirements=("Html:1" "Desktop:0")
           
           # Iterate through each directory name and check conditions
           for entry in "${dir_requirements[@]}"; do
-            # Split entry into name and min_count using parameter expansion
+            # Split entry into name and exact_count using parameter expansion
             dir_name="${entry%%:*}"
-            min_count="${entry##*:}"
-            dir_path="$base_dir/dir_name"
+            exact_count="${entry##*:}"
+            dir_path="$base_dir/$dir_name"
           
             # Check if the directory exists
             if [ -d "$dir_path" ]; then
@@ -83,8 +83,8 @@ jobs:
               actual_count=$(find "$dir_path" -type f -or -type d | wc -l) - 1
           
               # Check if the actual count meets or exceeds the minimum required count
-              if [ "$actual_count" -ge "$min_count" ]; then
-                echo "Directory $dir_path contains sufficient items ($actual_count found, minimum required: $min_count):"
+              if [ "$actual_count" -eq "$exact_count" ]; then
+                echo "Directory $dir_path has the exact required count ($actual_count items):"
                 # List directory contents based on the OS
                 if [[ ${{ matrix.os }} == "windows-latest" ]]; then
                   dir "$dir_path"
@@ -92,7 +92,7 @@ jobs:
                   ls -la "$dir_path"
                 fi
               else
-                echo "Directory $dir_path does not meet the required count. Expected at least $min_count, but found $actual_count." && exit 1
+                echo "Directory $dir_path does not meet the exact required count. Expected $exact_count, but found $actual_count." && exit 1
               fi
             else
               echo "Directory does not exist: $dir_path" && exit 1
