@@ -46,6 +46,23 @@ public class DistributeSimulationTask extends DefaultTask {
             log.info("Exporting HTML artifacts");
             generateHtmlArtifacts(manifest, distributionDirPath);
         }
+        if (platforms.contains(RunnerConfiguration.RunnerType.Desktop)) {
+            log.info("Exporting Desktop artifacts");
+            generateDesktopArtifacts(manifest, distributionDirPath);
+        }
+    }
+
+    /**
+     * Generate the Desktop simulation artifacts in the given directory (it will create a dir named {@link RunnerConfiguration.RunnerType#Desktop})
+     * @param distributionDirPath - the directory to generate
+     * @throws IOException - in case of errors in generation
+     */
+    public void generateDesktopArtifacts(SimulationManifest manifest, Path distributionDirPath) throws IOException {
+        Path DesktopDistDirPath = distributionDirPath.resolve(RunnerConfiguration.RunnerType.Desktop.name());
+        if (FileUtils.createDirIfNotExists(DesktopDistDirPath, true)) {
+            log.debug("Created Desktop distribution directory");
+        }
+
     }
 
     /**
@@ -56,7 +73,7 @@ public class DistributeSimulationTask extends DefaultTask {
     public void generateHtmlArtifacts(SimulationManifest manifest, Path distributionDirPath) throws IOException {
         Path htmlDistDirPath = distributionDirPath.resolve(RunnerConfiguration.RunnerType.Html.name());
         if (FileUtils.createDirIfNotExists(htmlDistDirPath, true)) {
-            log.info("Created html distribution directory");
+            log.debug("Created Html distribution directory");
         }
         SimulationUtils.distributeSimulation(getProject(), RunnerConfiguration.RunnerType.Html, SimulationUtils.getDistributeSimulationTaskEnvVariables(getProject()));
         log.info("[HTML] Collect artifacts...");

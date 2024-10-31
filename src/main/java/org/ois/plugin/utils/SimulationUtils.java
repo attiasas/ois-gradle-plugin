@@ -171,7 +171,7 @@ public class SimulationUtils {
      * @return - the tasks to preform in order to 'Run' simulation on the given platform
      */
     public static String[] getRunnerRunSimulationGradleTasks(RunnerConfiguration.RunnerType platform) {
-        if (RunnerConfiguration.RunnerType.Html.equals(platform)) {
+        if (platform != null) {
             return new String[]{"run"};
         } else {
             throw new RuntimeException("Unsupported platform type '" + platform + "'");

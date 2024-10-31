@@ -62,25 +62,31 @@ jobs:
           fi
         shell: bash
 
-      - name: Check Files in Distribution Directory
+      - name: Check Files in Distribution Directories
         run: |
-          dir_path="src/test/resources/projects/state-example/build/ois/distribution/Html"
-          # Check if the directory exists
-          if [ -d "$dir_path" ]; then
-            # Check if there are any files in the directory
-            if find "$dir_path" -type f -print -quit | grep -q .; then
-              # Check the OS and print directory contents accordingly
-              if [[ ${{ matrix.os }} == "windows-latest" ]]; then
-                echo "Listing files in $dir_path (Windows):"
-                dir "$dir_path"
+          # Directories to check
+          base_dir="src/test/resources/projects/state-example/build/ois/distribution"
+          distribution_dir=("Html" "Desktop")
+          
+          for dir_name in "${distribution_dir[@]}"; do
+            dir_path="$base_dir/dir_name"
+          
+            # Check if the directory exists
+            if [ -d "$dir_path" ]; then
+              # Check if there are any files in the directory
+              if find "$dir_path" -type f -print -quit | grep -q .; then
+                echo "Files found in $dir_path:"
+                # List directory contents based on the OS
+                if [[ ${{ matrix.os }} == "windows-latest" ]]; then
+                  dir "$dir_path"
+                else
+                  ls -la "$dir_path"
+                fi
               else
-                echo "Listing files in $dir_path (Unix-like):"
-                ls -la "$dir_path"
+                echo "No files found in $dir_path." && exit 1
               fi
             else
-              echo "No files found in the directory." && exit 1
+              echo "Directory does not exist: $dir_path" && exit 1
             fi
-          else
-            echo "Directory does not exist: $dir_path" && exit 1
-          fi
+          done
         shell: bash
