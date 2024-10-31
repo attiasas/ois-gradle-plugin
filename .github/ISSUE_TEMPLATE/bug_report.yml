@@ -39,9 +39,9 @@ body:
       required: false
 
   - type: input
-    id: core-version
+    id: plugin-version
     attributes:
-      label: OIS core version
+      label: OIS Gradle Plugin version
     validations:
       required: false
 

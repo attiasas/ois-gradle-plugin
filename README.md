@@ -1,63 +1,42 @@
-# ois-gradle-plugin
+<div align="center">
 
-## Table Of Content
+# Open Interactive Simulation Gradle Plugin
 
-- [📦 Installation](#-installation)
+[![Test](https://github.com/attiasas/ois-gradle-plugin/actions/workflows/test.yml/badge.svg)](https://github.com/attiasas/ois-gradle-plugin/actions/workflows/test.yml?branch=master)
 
-## 📦 Installation
+</div>
 
-Clone project to your local machine:
-```bash
-git clone https://github.com/attiasas/ois-gradle-plugin.git
-```
-Move to the cloned directory and publish it to your local maven repository:
-```bash
-./gradlew publishToMavenLocal
-```
-
-Add the following to your `build.gradle` file:
-```groovy
-plugins {
-    id 'org.ois.simulation' version '1.0-SNAPSHOT'
-}
-```
-Add the following to your `settings.gradle` file (Plugin is not public available):
-```groovy
-pluginManagement {
-    repositories {
-        mavenLocal()
-    }
-}
-```
-
-<details>
-<summary> <h2><a href="https://github.com/attiasas/ois-core/wiki">Home</a></h2> </summary>
-
-* [Getting Started](https://github.com/attiasas/ois-core/wiki#getting-started)
-* [Developer's Guide](https://github.com/attiasas/ois-core/wiki#developers-guide)
-
-</details>
+## Table of Contents
+- [📚 Overview](#-overview)
+- [🏗️ Usage](#-usage)
+- [🐞 Reporting Issues](#-reporting-issues)
+- [🤝 Contributions](#-contributions)
 
 ---
+## 📚 Overview
 
-<details>
-<summary> <a href="https://github.com/attiasas/ois-core/wiki#getting-started">Getting Started</a> </summary>
+Welcome to the OIS Gradle Plugin, a powerful tool designed to enhance your experience in developing, executing, and deploying OIS simulation projects. This plugin simplifies the integration of the OIS framework into your Gradle-based projects, allowing you to focus on building captivating simulations without the hassle of complex configurations.
 
-* [Setting Up a Dev Environment](https://github.com/attiasas/ois-core/wiki/Setting-Up-a-Dev-Environment)
-* [Configure Your Simulation Project](https://github.com/attiasas/ois-core/wiki/Configure-Your-Simulation-Project)
-* [Running and Debugging the Simulation](https://github.com/attiasas/ois-core/wiki/Running-and-Debugging-the-Simulation)
-* [Exporting the Simulation](https://github.com/attiasas/ois-core/wiki/Exporting-the-Simulation)
+By leveraging this plugin, you gain access to streamlined processes for project setup, dependency management, and execution of OIS simulations. It serves as a vital component in the ecosystem of OIS products, ensuring that you can develop your projects efficiently.
 
-</details>
+Join us on this journey to elevate your development experience and create engaging simulations with ease!
 
 ---
+## 🏗️ Usage
 
-<details>
-<summary> <a href="https://github.com/attiasas/ois-core/wiki#developers-guide">Developer's Guide</a> </summary>
+Discover the steps for implementing an OIS project by exploring our comprehensive [Wiki page](https://github.com/attiasas/ois-core/wiki).
 
-* [Managing States](https://github.com/attiasas/ois-core/wiki/Managing-States)
-* [Access Simulation Assets](https://github.com/attiasas/ois-core/wiki/Access-Simulation-Assets)
+---
+## 🐞 Reporting Issues
 
-</details>
+We highly recommend running Gradle with the ```-d```
+option to get useful and readable debug information if something goes wrong with your build.
 
-c
+Please help us improve the library
+by [reporting any issues](https://github.com/attiasas/ois-gradle-plugin/issues/new/choose) you encounter.
+
+---
+## 🤝 Contributions
+
+We welcome pull requests from the community. To help us improve this project, please read
+our [Contribution](CONTRIBUTING.md) guide.

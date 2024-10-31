@@ -182,31 +182,4 @@ public class HtmlUtils {
             throw new IllegalArgumentException("The following attributes were not found in the file content: " + missingAttributes);
         }
     }
-
-//    public static void main(String[] args) {
-//        String fileContent = """
-//                package org.ois.html;
-//
-//                import org.ois.core.runner.RunnerConfiguration;
-//
-//                public class SimulationConfig extends RunnerConfiguration {
-//                    public static final String TITLE = "OIS";
-//                    public static final int SCREEN_WIDTH = 0;
-//                    public static final String[] SUPPORTED_FORMATS = new String[] {"html", "json"};
-//
-//                    public SimulationConfig() {
-//                        super();
-//                        setType(RunnerType.Html);
-//                    }
-//                }
-//                """;
-//
-//        Map<String, Object> attributeMap = new HashMap<>();
-//        attributeMap.put("TITLE", "New Simulation Title");
-//        attributeMap.put("SCREEN_WIDTH", 1920);
-//        attributeMap.put("SUPPORTED_FORMATS", new String[] {"html", "xml", "txt"});
-//
-//        String updatedContent = HtmlUtils.updateConfigContent(fileContent, attributeMap);
-//        System.out.println(updatedContent);
-//    }
 }
