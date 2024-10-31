@@ -53,27 +53,24 @@ jobs:
           fi
         shell: bash
 
-#      - name: Run HTML Task on Project
-#        run: |
-#          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-#            Start-Process -NoNewWindow -FilePath ./gradlew.bat -ArgumentList "-p src\\test\\resources\\projects\\state-example runHtml" | Out-File -FilePath output.log -Append
-#            while (!(Select-String -Path output.log -Pattern "http://localhost:8080/")) { Start-Sleep -Seconds 5 }
-#          elif [ "${{ matrix.os }}" == "macos-latest" ]; then
-#            ./gradlew -p src/test/resources/projects/state-example runHtml | tee output.log &
-#            while ! grep -q "http://localhost:8080/" output.log; do sleep 5; done
-#          else
-#            ./gradlew -p src/test/resources/projects/state-example runHtml | tee output.log &
-#            while ! grep -q "http://localhost:8080/" output.log; do sleep 5; done
-#          fi
-#        shell: bash
-
-      - name: Complete Task
+      - name: Run HTML Task on Project
         run: |
-          if [[ ${{ matrix.os }} == "windows-latest" ]]; then
-            echo "Any key to finish the task" | cat > NUL
+          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            ./gradlew.bat -p src/test/resources/projects/state-example runHtml | tee output.log &
+            while ! grep -q "http://localhost:8080/" output.log; do sleep 5; done
           else
-            echo "Any key to finish the theask" | cat > /dev/null
+            ./gradlew -p src/test/resources/projects/state-example runHtml | tee output.log &
+            while ! grep -q "http://localhost:8080/" output.log; do sleep 5; done
           fi
+        shell: bash
+
+#      - name: Complete Task
+#        run: |
+#          if [[ ${{ matrix.os }} == "windows-latest" ]]; then
+#            echo "Any key to finish the task" | cat > NUL
+#          else
+#            echo "Any key to finish the task" | cat > /dev/null
+#          fi
 
   export-state-example-project:
     runs-on: ${{ matrix.os }}
@@ -128,21 +125,28 @@ jobs:
       - name: Check Files in Distribution Directory
         run: |
           dir="src/test/resources/projects/state-example/build/ois/distribution/html"
+          # Resolve the absolute path of the directory to avoid any relative path issues
+          dir_path=$(realpath "$dir" 2>/dev/null || echo "$dir")
 
-          # Check if there are any files in the directory
-          if find "$dir" -type f -print -quit | grep -q .; then
-            # Check the OS and print directory contents accordingly
-            if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
-              # Windows environment
-              echo "Listing files in $dir (Windows):"
-              dir "$dir"
+          # Check if the directory exists
+          if [ -d "$dir_path" ]; then
+            # Check if there are any files in the directory
+            if find "$dir_path" -type f -print -quit | grep -q .; then
+              # Check the OS and print directory contents accordingly
+              if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
+                # Windows environment
+                echo "Listing files in $dir_path (Windows):"
+                dir "$dir_path"
+              else
+                # Linux or macOS
+                echo "Listing files in $dir_path (Unix-like):"
+                ls -la "$dir_path"
+              fi
             else
-            # Linux or macOS
-              echo "Listing files in $dir (Unix-like):"
-              ls -la "$dir"
+              echo "No files found in the directory."
             fi
           else
-            echo "No files found in the directory."
+            echo "Directory does not exist: $dir_path"
           fi
           
           
