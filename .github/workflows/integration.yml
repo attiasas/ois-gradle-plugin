@@ -12,66 +12,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  run-state-example-project:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        branch: [simulation_engine]  # Adjust branches/tags as needed
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: "corretto"
-          java-version: "19"
-
-      - name: SetUp ois-core
-        run: |
-          git clone https://github.com/attiasas/ois-core.git --branch ${{ matrix.branch }}
-          cd ois-core
-          if [[ ${{ matrix.os }} == "windows-latest" ]]; then
-            ./gradlew.bat publishToMavenLocal
-          else
-            chmod +x gradlew
-            ./gradlew publishToMavenLocal
-          fi
-          cd ..  # Return to the main project working directory
-        shell: bash
-
-      - name: Publish Plugin to MavenLocal
-        run: |
-          if [[ ${{ matrix.os }} == "windows-latest" ]]; then
-            ./gradlew.bat publishToMavenLocal
-          else
-            chmod +x gradlew
-            ./gradlew publishToMavenLocal
-          fi
-        shell: bash
-
-      - name: Run HTML Task on Project
-        run: |
-          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            ./gradlew.bat -p src/test/resources/projects/state-example runHtml | tee output.log &
-            while ! grep -q "http://localhost:8080/" output.log; do sleep 5; done
-          else
-            ./gradlew -p src/test/resources/projects/state-example runHtml | tee output.log &
-            while ! grep -q "http://localhost:8080/" output.log; do sleep 5; done
-          fi
-        shell: bash
-
-#      - name: Complete Task
-#        run: |
-#          if [[ ${{ matrix.os }} == "windows-latest" ]]; then
-#            echo "Any key to finish the task" | cat > NUL
-#          else
-#            echo "Any key to finish the task" | cat > /dev/null
-#          fi
-
   export-state-example-project:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -116,9 +56,9 @@ jobs:
       - name: Run Export Task
         run: |
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            ./gradlew.bat -p src\\test\\resources\\projects\\state-example export
+            ./gradlew.bat -p src\\test\\resources\\projects\\state-example export --info
           else
-            ./gradlew -p src/test/resources/projects/state-example export
+            ./gradlew -p src/test/resources/projects/state-example export --info
           fi
         shell: bash
 

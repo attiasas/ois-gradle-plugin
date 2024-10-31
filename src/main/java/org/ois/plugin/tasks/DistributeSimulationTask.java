@@ -61,7 +61,7 @@ public class DistributeSimulationTask extends DefaultTask {
         SimulationUtils.distributeSimulation(getProject(), RunnerConfiguration.RunnerType.Html, SimulationUtils.getDistributeSimulationTaskEnvVariables(getProject()));
         log.info("[HTML] Collect artifacts...");
         ZipUtils.zipItems(htmlDistDirPath.resolve(manifest.getTitle() + ".zip"), getHtmlFilesToZip());
-        log.info("[HTML] Artifacts generated successfully");
+        log.info("[HTML] Artifacts generated successfully at {}", htmlDistDirPath);
     }
 
     /**
