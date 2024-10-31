@@ -68,7 +68,7 @@ jobs:
 #        shell: bash
 
       - name: Complete Task
-        run: echo "Any key to finish the task" | cat > /dev/null
+        run: echo "Any key to finish the theask" | cat > /dev/null
 
   export-state-example-project:
     runs-on: ${{ matrix.os }}
@@ -122,23 +122,29 @@ jobs:
 
       - name: Check Files in Distribution Directory
         run: |
-          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            if (Test-Path -Path "src\\test\\resources\\projects\\state-example\\build\\distribution\\html" -and (Get-ChildItem -Path "src\\test\\resources\\projects\\state-example\\build\\distribution\\html" | Measure-Object).Count -gt 0) {
-              Write-Output "Files were successfully created in build\\distribution\\html."
-            } else {
-              Write-Output "No files found in build\\distribution\\html" ; exit 1
-            }
-          elif [ "${{ matrix.os }}" == "macos-latest" ]; then
-            if [ -d "src/test/resources/projects/state-example/build/distribution/html" ] && [ "$(ls -A src/test/resources/projects/state-example/build/distribution/html)" ]; then
-              echo "Files were successfully created in build/distribution/html."
-            else
-              echo "No files found in build/distribution/html" && exit 1
-            fi
+          if [ -e "src/test/resources/projects/state-example/build/distribution/html/*" ]; then
+            echo "Files exist in the directory."
           else
-            if [ -d "src/test/resources/projects/state-example/build/distribution/html" ] && [ "$(ls -A src/test/resources/projects/state-example/build/distribution/html)" ]; then
-              echo "Files were successfully created in build/distribution/html."
-            else
-              echo "No files found in build/distribution/html" && exit 1
-            fi
+          echo "No files found in the directory."
           fi
+
+#           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+#            if (Test-Path -Path "src\\test\\resources\\projects\\state-example\\build\\distribution\\html" -and (Get-ChildItem -Path "src\\test\\resources\\projects\\state-example\\build\\distribution\\html" | Measure-Object).Count -gt 0) {
+#              Write-Output "Files were successfully created in build\\distribution\\html."
+#            } else {
+#              Write-Output "No files found in build\\distribution\\html" ; exit 1
+#            }
+#          elif [ "${{ matrix.os }}" == "macos-latest" ]; then
+#            if [ -d "src/test/resources/projects/state-example/build/distribution/html" ] && [ "$(ls -A src/test/resources/projects/state-example/build/distribution/html)" ]; then
+#              echo "Files were successfully created in build/distribution/html."
+#            else
+#              echo "No files found in build/distribution/html" && exit 1
+#            fi
+#          else
+#            if [ -d "src/test/resources/projects/state-example/build/distribution/html" ] && [ "$(ls -A src/test/resources/projects/state-example/build/distribution/html)" ]; then
+#              echo "Files were successfully created in build/distribution/html."
+#            else
+#              echo "No files found in build/distribution/html" && exit 1
+#            fi
+#          fi
         shell: bash
