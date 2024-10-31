@@ -18,7 +18,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest, windows-latest, macOS-latest ]
-        branch: [simulation_engine]  # Adjust branches/tags as needed
+        branch: [main]  # Adjust branches/tags as needed
     steps:
       - uses: actions/checkout@v4
         with:
