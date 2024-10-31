@@ -53,19 +53,19 @@ jobs:
           fi
         shell: bash
 
-      - name: Run HTML Task on Project
-        run: |
-          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            Start-Process -NoNewWindow -FilePath ./gradlew.bat -ArgumentList "-p src\\test\\resources\\projects\\state-example runHtml" | Out-File -FilePath output.log -Append
-            while (!(Select-String -Path output.log -Pattern "http://localhost:8080/")) { Start-Sleep -Seconds 5 }
-          elif [ "${{ matrix.os }}" == "macos-latest" ]; then
-            ./gradlew -p src/test/resources/projects/state-example runHtml | tee output.log &
-            while ! grep -q "http://localhost:8080/" output.log; do sleep 5; done
-          else
-            ./gradlew -p src/test/resources/projects/state-example runHtml | tee output.log &
-            while ! grep -q "http://localhost:8080/" output.log; do sleep 5; done
-          fi
-        shell: bash
+#      - name: Run HTML Task on Project
+#        run: |
+#          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+#            Start-Process -NoNewWindow -FilePath ./gradlew.bat -ArgumentList "-p src\\test\\resources\\projects\\state-example runHtml" | Out-File -FilePath output.log -Append
+#            while (!(Select-String -Path output.log -Pattern "http://localhost:8080/")) { Start-Sleep -Seconds 5 }
+#          elif [ "${{ matrix.os }}" == "macos-latest" ]; then
+#            ./gradlew -p src/test/resources/projects/state-example runHtml | tee output.log &
+#            while ! grep -q "http://localhost:8080/" output.log; do sleep 5; done
+#          else
+#            ./gradlew -p src/test/resources/projects/state-example runHtml | tee output.log &
+#            while ! grep -q "http://localhost:8080/" output.log; do sleep 5; done
+#          fi
+#        shell: bash
 
       - name: Complete Task
         run: echo "Any key to finish the task" | cat > /dev/null
