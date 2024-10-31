@@ -68,7 +68,12 @@ jobs:
 #        shell: bash
 
       - name: Complete Task
-        run: echo "Any key to finish the theask" | cat > /dev/null
+        run: |
+          if [[ ${{ matrix.os }} == "windows-latest" ]]; then
+            echo "Any key to finish the task" | cat > NUL
+          else
+            echo "Any key to finish the theask" | cat > /dev/null
+          fi
 
   export-state-example-project:
     runs-on: ${{ matrix.os }}
@@ -122,10 +127,24 @@ jobs:
 
       - name: Check Files in Distribution Directory
         run: |
-          if [ -e "src/test/resources/projects/state-example/build/distribution/html/*" ]; then
+          dir="src/test/resources/projects/state-example/build/distribution/html"
+
+          # Check if there are any files in the directory
+          if find "$dir" -type f -print -quit | grep -q .; then
             echo "Files exist in the directory."
           else
-          echo "No files found in the directory."
+            echo "No files found in the directory."
+          fi
+          
+          # Check the OS and print directory contents accordingly
+          if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
+            # Windows environment
+            echo "Listing files in $dir (Windows):"
+            dir "$dir"
+          else
+            # Linux or macOS
+            echo "Listing files in $dir (Unix-like):"
+            ls -la "$dir"
           fi
 
 #           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
