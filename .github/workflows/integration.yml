@@ -64,7 +64,7 @@ jobs:
 
       - name: Check Files in Distribution Directory
         run: |
-          $dir_path="src/test/resources/projects/state-example/build/ois/distribution/Html"
+          dir_path="src/test/resources/projects/state-example/build/ois/distribution/Html"
           # Check if the directory exists
           if [ -d "$dir_path" ]; then
             # Check if there are any files in the directory
