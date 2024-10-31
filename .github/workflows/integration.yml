@@ -67,20 +67,20 @@ jobs:
           # Base path for directories to check
           base_dir="src/test/resources/projects/state-example/build/ois/distribution"
           
-          # Define directory prefixes with required minimum count (format: "dir_prefix:min_count")
+          # Define directory names with required minimum count (format: "dir_name:min_count")
           dir_requirements=("Html:1" "Desktop:0")
           
-          # Iterate through each directory prefix and check conditions
+          # Iterate through each directory name and check conditions
           for entry in "${dir_requirements[@]}"; do
-            # Split entry into prefix and min_count using parameter expansion
-            prefix="${entry%%:*}"
+            # Split entry into name and min_count using parameter expansion
+            dir_name="${entry%%:*}"
             min_count="${entry##*:}"
-            dir_path="$base_dir/$prefix"
+            dir_path="$base_dir/dir_name"
           
             # Check if the directory exists
             if [ -d "$dir_path" ]; then
               # Count files and directories within the current directory
-              actual_count=$(find "$dir_path" -type f -or -type d | wc -l)
+              actual_count=$(find "$dir_path" -type f -or -type d | wc -l) - 1
           
               # Check if the actual count meets or exceeds the minimum required count
               if [ "$actual_count" -ge "$min_count" ]; then
