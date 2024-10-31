@@ -83,7 +83,7 @@ jobs:
               actual_count=$(find "$dir_path" -type f -or -type d | wc -l)
           
               # Check if the actual count meets or exceeds the minimum required count
-              if [ "$actual_count" -eq "$((exact_count - 1))" ]; then
+              if [ "$((actual_count - 1))" -eq "$exact_count" ]; then
                 echo "Directory $dir_path has the exact required count ($actual_count items):"
                 # List directory contents based on the OS
                 if [[ ${{ matrix.os }} == "windows-latest" ]]; then
