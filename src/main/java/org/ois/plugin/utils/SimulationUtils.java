@@ -137,6 +137,8 @@ public class SimulationUtils {
 
         public Path getHtmlRunnerDirectory() { return this.workingDirectory.resolve("html-runner"); }
 
+        public Path getDesktopDirectory() { return this.workingDirectory.resolve("desktop-runner"); }
+
         @Override
         public String toString() {
             return "SimulationRunner{" +
@@ -171,11 +173,15 @@ public class SimulationUtils {
      * @return - the tasks to preform in order to 'Run' simulation on the given platform
      */
     public static String[] getRunnerRunSimulationGradleTasks(RunnerConfiguration.RunnerType platform) {
-        if (platform != null) {
-            return new String[]{"run"};
-        } else {
-            throw new RuntimeException("Unsupported platform type '" + platform + "'");
+        switch (platform) {
+            case Html -> {
+                return new String[]{"serveHtml"};
+            }
+            case Desktop -> {
+                return new String[]{"run"};
+            }
         }
+        throw new RuntimeException("Unsupported platform type '" + platform + "'");
     }
 
     /**
@@ -205,11 +211,15 @@ public class SimulationUtils {
      * @return - the tasks to preform in order to 'Distribute' simulation on the given platform
      */
     public static String[] getRunnerDistributionGradleTasks(RunnerConfiguration.RunnerType platform) {
-        if (RunnerConfiguration.RunnerType.Html.equals(platform)) {
-            return new String[]{"build"};
-        } else {
-            throw new RuntimeException("Unsupported platform type '" + platform + "'");
+        switch (platform) {
+            case Html -> {
+                return new String[]{"build"};
+            }
+            case Desktop -> {
+                return new String[]{"jar"};
+            }
         }
+        throw new RuntimeException("Unsupported platform type '" + platform + "'");
     }
 
     /**

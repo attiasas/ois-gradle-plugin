@@ -58,11 +58,14 @@ public class DistributeSimulationTask extends DefaultTask {
      * @throws IOException - in case of errors in generation
      */
     public void generateDesktopArtifacts(SimulationManifest manifest, Path distributionDirPath) throws IOException {
-        Path DesktopDistDirPath = distributionDirPath.resolve(RunnerConfiguration.RunnerType.Desktop.name());
-        if (FileUtils.createDirIfNotExists(DesktopDistDirPath, true)) {
+        Path desktopDistDirPath = distributionDirPath.resolve(RunnerConfiguration.RunnerType.Desktop.name());
+        if (FileUtils.createDirIfNotExists(desktopDistDirPath, true)) {
             log.debug("Created Desktop distribution directory");
         }
-
+        SimulationUtils.distributeSimulation(getProject(), RunnerConfiguration.RunnerType.Desktop, SimulationUtils.getDistributeSimulationTaskEnvVariables(getProject()));
+        log.info("[Desktop] Collect artifacts...");
+        FileUtils.copyDirectoryContent(SimulationUtils.getRunner(getProject()).getDesktopDirectory().resolve("build").resolve("libs"), desktopDistDirPath);
+        log.info("[Desktop] Artifacts generated successfully at {}", desktopDistDirPath);
     }
 
     /**
