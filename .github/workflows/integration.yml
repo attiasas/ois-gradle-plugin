@@ -64,56 +64,23 @@ jobs:
 
       - name: Check Files in Distribution Directory
         run: |
-          dir="src/test/resources/projects/state-example/build/ois/distribution/html"
-          # Resolve the absolute path of the directory to avoid any relative path issues
-          dir_path=$(realpath "$dir" 2>/dev/null || echo "$dir")
-
+          $dir_path="src/test/resources/projects/state-example/build/ois/distribution/Html"
           # Check if the directory exists
           if [ -d "$dir_path" ]; then
             # Check if there are any files in the directory
             if find "$dir_path" -type f -print -quit | grep -q .; then
               # Check the OS and print directory contents accordingly
-              if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
-                # Windows environment
+              if [[ ${{ matrix.os }} == "windows-latest" ]]; then
                 echo "Listing files in $dir_path (Windows):"
                 dir "$dir_path"
               else
-                # Linux or macOS
                 echo "Listing files in $dir_path (Unix-like):"
                 ls -la "$dir_path"
               fi
             else
-              echo "No files found in the directory."
+              echo "No files found in the directory." && exit 1
             fi
           else
-            echo "Directory does not exist: $dir_path"
+            echo "Directory does not exist: $dir_path" && exit 1
           fi
-          # Check if the directory is not empty
-          if ls "$dir"/* 1> /dev/null 2>&1; then
-            echo "2: Files exist in the directory."
-          else
-          echo "2: No files found in the directory."
-          fi
-          
-          
-
-#           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-#            if (Test-Path -Path "src\\test\\resources\\projects\\state-example\\build\\distribution\\html" -and (Get-ChildItem -Path "src\\test\\resources\\projects\\state-example\\build\\distribution\\html" | Measure-Object).Count -gt 0) {
-#              Write-Output "Files were successfully created in build\\distribution\\html."
-#            } else {
-#              Write-Output "No files found in build\\distribution\\html" ; exit 1
-#            }
-#          elif [ "${{ matrix.os }}" == "macos-latest" ]; then
-#            if [ -d "src/test/resources/projects/state-example/build/distribution/html" ] && [ "$(ls -A src/test/resources/projects/state-example/build/distribution/html)" ]; then
-#              echo "Files were successfully created in build/distribution/html."
-#            else
-#              echo "No files found in build/distribution/html" && exit 1
-#            fi
-#          else
-#            if [ -d "src/test/resources/projects/state-example/build/distribution/html" ] && [ "$(ls -A src/test/resources/projects/state-example/build/distribution/html)" ]; then
-#              echo "Files were successfully created in build/distribution/html."
-#            else
-#              echo "No files found in build/distribution/html" && exit 1
-#            fi
-#          fi
         shell: bash
