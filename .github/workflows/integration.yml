@@ -64,17 +64,18 @@ jobs:
 
       - name: Check Files in Distribution Directories with Minimum Count
         run: |
-          # Base path and prefix for directories to check
+          # Base path for directories to check
           base_dir="src/test/resources/projects/state-example/build/ois/distribution"
           
-          # Define directory prefixes and the minimum expected count of files/directories for each
-          declare -A dir_requirements
-          dir_requirements=( ["Html"]=1 ["Desktop"]=0 )  # Set required counts here
+          # Define directory prefixes with required minimum count (format: "dir_prefix:min_count")
+          dir_requirements=("Html:1" "Desktop:0")
           
           # Iterate through each directory prefix and check conditions
-          for dir_name in "${!dir_requirements[@]}"; do
-            dir_path="$base_dir/$dir_name"
-            min_count=${dir_requirements[$dir_name]}
+          for entry in "${dir_requirements[@]}"; do
+            # Split entry into prefix and min_count using parameter expansion
+            prefix="${entry%%:*}"
+            min_count="${entry##*:}"
+            dir_path="$base_dir/$prefix"
           
             # Check if the directory exists
             if [ -d "$dir_path" ]; then
