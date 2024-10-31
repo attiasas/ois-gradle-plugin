@@ -58,7 +58,7 @@ jobs:
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
             Start-Process -NoNewWindow -FilePath ./gradlew.bat -ArgumentList "-p src\\test\\resources\\projects\\state-example runHtml" | Out-File -FilePath output.log -Append
             while (!(Select-String -Path output.log -Pattern "http://localhost:8080/")) { Start-Sleep -Seconds 5 }
-          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+          elif [ "${{ matrix.os }}" == "macos-latest" ]; then
             ./gradlew -p src/test/resources/projects/state-example runHtml | tee output.log &
             while ! grep -q "http://localhost:8080/" output.log; do sleep 5; done
           else
@@ -128,7 +128,7 @@ jobs:
             } else {
               Write-Output "No files found in build\\distribution\\html" ; exit 1
             }
-          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+          elif [ "${{ matrix.os }}" == "macos-latest" ]; then
             if [ -d "src/test/resources/projects/state-example/build/distribution/html" ] && [ "$(ls -A src/test/resources/projects/state-example/build/distribution/html)" ]; then
               echo "Files were successfully created in build/distribution/html."
             else
