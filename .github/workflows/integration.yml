@@ -127,25 +127,25 @@ jobs:
 
       - name: Check Files in Distribution Directory
         run: |
-          dir="src/test/resources/projects/state-example/build/distribution/html"
+          dir="src/test/resources/projects/state-example/build/ois/distribution/html"
 
           # Check if there are any files in the directory
           if find "$dir" -type f -print -quit | grep -q .; then
-            echo "Files exist in the directory."
+            # Check the OS and print directory contents accordingly
+            if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
+              # Windows environment
+              echo "Listing files in $dir (Windows):"
+              dir "$dir"
+            else
+            # Linux or macOS
+              echo "Listing files in $dir (Unix-like):"
+              ls -la "$dir"
+            fi
           else
             echo "No files found in the directory."
           fi
           
-          # Check the OS and print directory contents accordingly
-          if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
-            # Windows environment
-            echo "Listing files in $dir (Windows):"
-            dir "$dir"
-          else
-            # Linux or macOS
-            echo "Listing files in $dir (Unix-like):"
-            ls -la "$dir"
-          fi
+          
 
 #           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
 #            if (Test-Path -Path "src\\test\\resources\\projects\\state-example\\build\\distribution\\html" -and (Get-ChildItem -Path "src\\test\\resources\\projects\\state-example\\build\\distribution\\html" | Measure-Object).Count -gt 0) {
