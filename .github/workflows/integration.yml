@@ -80,10 +80,10 @@ jobs:
             # Check if the directory exists
             if [ -d "$dir_path" ]; then
               # Count files and directories within the current directory
-              actual_count=$(find "$dir_path" -type f -or -type d | wc -l) - 1
+              actual_count=$(find "$dir_path" -type f -or -type d | wc -l)
           
               # Check if the actual count meets or exceeds the minimum required count
-              if [ "$actual_count" -eq "$exact_count" ]; then
+              if [ "$actual_count" -eq "$((exact_count - 1))" ]; then
                 echo "Directory $dir_path has the exact required count ($actual_count items):"
                 # List directory contents based on the OS
                 if [[ ${{ matrix.os }} == "windows-latest" ]]; then
