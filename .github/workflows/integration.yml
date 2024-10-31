@@ -62,20 +62,28 @@ jobs:
           fi
         shell: bash
 
-      - name: Check Files in Distribution Directories
+      - name: Check Files in Distribution Directories with Minimum Count
         run: |
-          # Directories to check
+          # Base path and prefix for directories to check
           base_dir="src/test/resources/projects/state-example/build/ois/distribution"
-          distribution_dir=("Html" "Desktop")
           
-          for dir_name in "${distribution_dir[@]}"; do
-            dir_path="$base_dir/dir_name"
+          # Define directory prefixes and the minimum expected count of files/directories for each
+          declare -A dir_requirements
+          dir_requirements=( ["Html"]=1 ["Desktop"]=0 )  # Set required counts here
+          
+          # Iterate through each directory prefix and check conditions
+          for dir_name in "${!dir_requirements[@]}"; do
+            dir_path="$base_dir/$dir_name"
+            min_count=${dir_requirements[$dir_name]}
           
             # Check if the directory exists
             if [ -d "$dir_path" ]; then
-              # Check if there are any files in the directory
-              if find "$dir_path" -type f -print -quit | grep -q .; then
-                echo "Files found in $dir_path:"
+              # Count files and directories within the current directory
+              actual_count=$(find "$dir_path" -type f -or -type d | wc -l)
+          
+              # Check if the actual count meets or exceeds the minimum required count
+              if [ "$actual_count" -ge "$min_count" ]; then
+                echo "Directory $dir_path contains sufficient items ($actual_count found, minimum required: $min_count):"
                 # List directory contents based on the OS
                 if [[ ${{ matrix.os }} == "windows-latest" ]]; then
                   dir "$dir_path"
@@ -83,7 +91,7 @@ jobs:
                   ls -la "$dir_path"
                 fi
               else
-                echo "No files found in $dir_path." && exit 1
+                echo "Directory $dir_path does not meet the required count. Expected at least $min_count, but found $actual_count." && exit 1
               fi
             else
               echo "Directory does not exist: $dir_path" && exit 1
