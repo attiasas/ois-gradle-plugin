@@ -88,6 +88,12 @@ jobs:
           else
             echo "Directory does not exist: $dir_path"
           fi
+          # Check if the directory is not empty
+          if ls "$dir"/* 1> /dev/null 2>&1; then
+            echo "2: Files exist in the directory."
+          else
+          echo "2: No files found in the directory."
+          fi
           
           
 
