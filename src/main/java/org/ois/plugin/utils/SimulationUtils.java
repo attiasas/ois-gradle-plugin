@@ -68,6 +68,10 @@ public class SimulationUtils {
         return getSimulationRunnersResourcesDirectory(project).resolve(Assets.ASSETS_DIRECTORY);
     }
 
+    public static Path getSimulationRunnersIconsDirectory(Project project) {
+        return getSimulationRunnersResourcesDirectory(project).resolve("icons");
+    }
+
     public static Path getSimulationRunnersManifestFile(Project project) {
         return getSimulationRunnersResourcesDirectory(project).resolve(SimulationManifest.DEFAULT_FILE_NAME);
     }
@@ -137,7 +141,7 @@ public class SimulationUtils {
 
         public Path getHtmlRunnerDirectory() { return this.workingDirectory.resolve("html-runner"); }
 
-        public Path getDesktopDirectory() { return this.workingDirectory.resolve("desktop-runner"); }
+        public Path getDesktopRunnerDirectory() { return this.workingDirectory.resolve("desktop-runner"); }
 
         @Override
         public String toString() {
@@ -160,11 +164,12 @@ public class SimulationUtils {
 
     /**
      * Get the simulation runner expected environment variables required by the runners project to 'Run' a simulation.
+     * @param manifest - the simulation manifest of the project.
      * @param project - the project to get its configurations and generate the env vars.
      * @return map of environment variables used to execute 'Run simulation' task in the runner project
      */
-    public static Map<String, String> getRunSimulationTaskEnvVariables(Project project) {
-        return getDistributeSimulationTaskEnvVariables(project);
+    public static Map<String, String> getRunSimulationTaskEnvVariables(SimulationManifest manifest, Project project) {
+        return getDistributeSimulationTaskEnvVariables(manifest, project);
     }
 
     /**
@@ -200,8 +205,11 @@ public class SimulationUtils {
      * @param project - the project to get its configurations and generate the env vars.
      * @return map of environment variables used to execute 'Distribute simulation' task in the runner project
      */
-    public static Map<String, String> getDistributeSimulationTaskEnvVariables(Project project) {
+    public static Map<String, String> getDistributeSimulationTaskEnvVariables(SimulationManifest manifest, Project project) {
         Map<String, String> env = new HashMap<>();
+        env.put(Const.SimulationEnvVar.PROJECT_TITLE, manifest.getTitle());
+        env.put(Const.SimulationEnvVar.PROJECT_VERSION, project.getVersion().toString());
+        env.put(Const.SimulationEnvVar.PROJECT_GROUP, project.getGroup().toString());
         return env;
     }
 
@@ -216,7 +224,7 @@ public class SimulationUtils {
                 return new String[]{"build"};
             }
             case Desktop -> {
-                return new String[]{"jar"};
+                return new String[]{"clean", "jpackageImage"};
             }
         }
         throw new RuntimeException("Unsupported platform type '" + platform + "'");

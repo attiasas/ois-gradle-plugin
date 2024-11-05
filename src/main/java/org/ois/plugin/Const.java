@@ -21,6 +21,12 @@ public class Const {
         public static final Version OIS_CORE_VERSION = new Version("0.1-SNAPSHOT");
     }
 
+    public static class SimulationEnvVar {
+        public static final String PROJECT_GROUP = "OIS_PROJECT_GROUP";
+        public static final String PROJECT_VERSION = "OIS_PROJECT_VERSION";
+        public static final String PROJECT_TITLE = "OIS_PROJECT_TITLE";
+    }
+
     /** The name of the extension object to configure the plugin **/
     public static final String PLUGIN_EXTENSION_NAME = "simulation";
     /** The name of the group the plugin tasks **/

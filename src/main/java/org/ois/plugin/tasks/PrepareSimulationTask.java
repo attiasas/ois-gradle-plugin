@@ -12,6 +12,9 @@ import org.ois.core.utils.io.FileUtils;
 import org.ois.core.utils.io.data.formats.JsonFormat;
 import org.ois.plugin.Const;
 import org.ois.plugin.PluginConfiguration;
+import org.ois.plugin.tools.IconHandler;
+import org.ois.plugin.tools.JavaFileContentReplacer;
+import org.ois.plugin.utils.DesktopUtils;
 import org.ois.plugin.utils.GitUtils;
 import org.ois.plugin.utils.HtmlUtils;
 import org.ois.plugin.utils.SimulationUtils;
@@ -20,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Hashtable;
@@ -38,7 +42,7 @@ public class PrepareSimulationTask extends DefaultTask {
      * @throws GitAPIException - In case of error when downloading the runners repository
      */
     @TaskAction
-    public void prepareSimulation() throws IOException, GitAPIException {
+    public void prepareSimulation() throws IOException, GitAPIException, URISyntaxException {
         log.info("Prepare components and initialize environment");
         if (!SimulationUtils.getProjectBuildDirectory(getProject()).toFile().exists()) {
             throw new IllegalStateException("Project must be built before preparing its simulation");
@@ -47,12 +51,18 @@ public class PrepareSimulationTask extends DefaultTask {
         if (FileUtils.createDirIfNotExists(oisSimulationDirPath, true)) {
             log.debug("Created project simulation directory");
         }
+        // Prepare runner and resources for the simulation
         SimulationUtils.SimulationRunner runner = prepareRunners(getProject());
         SimulationManifest manifest = prepareResources(getProject());
         // Prepare Html extra steps
         if (manifest.getPlatforms().contains(RunnerConfiguration.RunnerType.Html)) {
             log.debug("Prepare html resources...");
             prepareHtmlResources(getProject(), runner, manifest);
+        }
+        // Prepare Desktop extra steps
+        if (manifest.getPlatforms().contains(RunnerConfiguration.RunnerType.Desktop)) {
+            log.debug("Prepare Desktop resources....");
+            prepareDesktopResources(getProject(), runner);
         }
         log.info("Simulation environment is ready");
     }
@@ -81,7 +91,7 @@ public class PrepareSimulationTask extends DefaultTask {
         return runner;
     }
 
-    private SimulationManifest prepareResources(Project project) throws IOException {
+    private SimulationManifest prepareResources(Project project) throws IOException, URISyntaxException {
         Path oisResourcesDirPath = SimulationUtils.getSimulationRunnersResourcesDirectory(project);
         if (FileUtils.createDirIfNotExists(oisResourcesDirPath, true)) {
             log.debug("Created ois simulation 'resources' directory");
@@ -98,26 +108,37 @@ public class PrepareSimulationTask extends DefaultTask {
             log.debug("'assets' directory located, copy content");
             FileUtils.copyDirectoryContent(projectAssetsDir, SimulationUtils.getSimulationRunnersAssetsDirectory(project));
         }
+        Path projectIconsDir = projectSimulationDir.resolve("icons");
+        if (projectIconsDir.toFile().exists() && projectIconsDir.toFile().isDirectory()) {
+            log.info("'icons' directory located, copy content");
+            FileUtils.copyDirectoryContent(projectIconsDir, SimulationUtils.getSimulationRunnersIconsDirectory(project));
+        } else {
+            log.info("Using default icons");
+            IconHandler.copyDefaultIcons(SimulationUtils.getSimulationRunnersIconsDirectory(project));
+        }
         // Create simulation manifest that will be used by runners
-        SimulationManifest manifest = createManifest(projectSimulationDir);
+        return transferManifestToRunner(projectSimulationDir);
+    }
+
+    private SimulationManifest transferManifestToRunner(Path projectSimulationDir) throws IOException {
+        SimulationManifest manifest = loadProjectManifest(projectSimulationDir);
         String manifestData = JsonFormat.humanReadable().serialize(manifest);
         log.debug("Runners simulation manifest:\n{}", manifestData);
-        Files.writeString(SimulationUtils.getSimulationRunnersManifestFile(project), manifestData);
+        Files.writeString(SimulationUtils.getSimulationRunnersManifestFile(getProject()), manifestData);
         return manifest;
     }
 
-    private SimulationManifest createManifest(Path projectSimulationDir) throws IOException {
+    private SimulationManifest loadProjectManifest(Path projectSimulationDir) throws IOException {
         try (InputStream in = Files.newInputStream(projectSimulationDir.resolve(SimulationManifest.DEFAULT_FILE_NAME))) {
             SimulationManifest manifest = JsonFormat.humanReadable().load(new SimulationManifest(), in);
-
+            // Default value for optional attribute 'title'
             if (manifest.getTitle().isBlank()) {
                 manifest.setTitle("OIS");
             }
-
+            // Default value for optional attribute 'platforms'
             if (manifest.getPlatforms().isEmpty()) {
                 manifest.getPlatforms().addAll(List.of(RunnerConfiguration.RunnerType.values()));
             }
-
             return manifest;
         }
     }
@@ -135,8 +156,8 @@ public class PrepareSimulationTask extends DefaultTask {
             htmlSimulationConfigFileAttributes.put("LOG_TOPICS", logTopics);
         }
         // Generate new content with injected values
-        String updatedContent = HtmlUtils.getUpdateConfigFileContent(HtmlUtils.getSimulationConfigContent(runner.getHtmlRunnerDirectory()), htmlSimulationConfigFileAttributes);
-        log.debug("Replacing 'SimulationConfig.java' content at runner directory with the project config:\n{}", updatedContent);
+        String updatedContent = JavaFileContentReplacer.replaceJavaStaticFinalVals(HtmlUtils.getSimulationConfigContent(runner.getHtmlRunnerDirectory()), htmlSimulationConfigFileAttributes);
+        log.debug("Replacing 'HtmlSimulationConfig.java' content at runner directory with the project config:\n{}", updatedContent);
         // Save
         Files.writeString(HtmlUtils.getSimulationConfigPath(runner.getHtmlRunnerDirectory()), updatedContent);
         log.debug("Generating Reflection items file content");
@@ -146,5 +167,19 @@ public class PrepareSimulationTask extends DefaultTask {
             return;
         }
         Files.writeString(HtmlUtils.getReflectionsItemsFilePath(project), reflectionsContent);
+    }
+
+    private void prepareDesktopResources(Project project, SimulationUtils.SimulationRunner runner) throws IOException {
+        // Attributes to inject
+        Map<String, Object> desktopSimulationConfigFileAttributes = new Hashtable<>(Map.of("LOG_LEVEL", PluginConfiguration.getLogLevel(project)));
+        String[] logTopics = PluginConfiguration.getLogTopics(project);
+        if (logTopics != null) {
+            desktopSimulationConfigFileAttributes.put("LOG_TOPICS", logTopics);
+        }
+        // Generate new content with injected values
+        String updatedContent = JavaFileContentReplacer.replaceJavaStaticFinalVals(DesktopUtils.getSimulationConfigContent(runner.getDesktopRunnerDirectory()), desktopSimulationConfigFileAttributes);
+        log.debug("Replacing 'DesktopSimulationConfig.java' content at runner directory with the project config:\n{}", updatedContent);
+        // Save
+        Files.writeString(DesktopUtils.getSimulationConfigPath(runner.getDesktopRunnerDirectory()), updatedContent);
     }
 }

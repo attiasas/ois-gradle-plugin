@@ -42,8 +42,12 @@ public class GreenState implements IState {
 
     @Override
     public void dispose() {
-        batch.dispose();
-        img.dispose();
+        if (batch != null) {
+            batch.dispose();
+        }
+        if (img != null) {
+            img.dispose();
+        }
     }
 
     @Override

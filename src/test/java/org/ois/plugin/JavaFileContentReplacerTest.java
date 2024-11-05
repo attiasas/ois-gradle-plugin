@@ -1,6 +1,7 @@
 package org.ois.plugin;
 
 import org.ois.core.utils.io.FileUtils;
+import org.ois.plugin.tools.JavaFileContentReplacer;
 import org.ois.plugin.utils.HtmlUtils;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
@@ -12,9 +13,9 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertTrue;
 
-public class HtmlUtilsTest {
+public class JavaFileContentReplacerTest {
 
     @Test
     public void testGetSimulationConfigContent() throws IOException {
@@ -47,7 +48,7 @@ public class HtmlUtilsTest {
     @Test(dataProvider = "updateConfigProvider")
     public void testGetUpdateConfigFileContent(String originalContent, Map<String, Object> attributeMap, String expectedUpdatedContent) {
         // Act
-        String actualUpdatedContent = HtmlUtils.getUpdateConfigFileContent(originalContent, attributeMap);
+        String actualUpdatedContent = JavaFileContentReplacer.replaceJavaStaticFinalVals(originalContent, attributeMap);
 
         // Assert
         Assert.assertEquals(actualUpdatedContent.trim(), expectedUpdatedContent.trim());
@@ -71,7 +72,7 @@ public class HtmlUtilsTest {
         ));
 
         // Act
-        HtmlUtils.getUpdateConfigFileContent(originalContent, attributeMap); // Should throw exception
+        JavaFileContentReplacer.replaceJavaStaticFinalVals(originalContent, attributeMap); // Should throw exception
     }
 
     @DataProvider(name = "updateConfigProvider")
@@ -133,4 +134,5 @@ public class HtmlUtilsTest {
         assertTrue(FileUtils.deleteDirectoryContent(path));
         assertTrue(path.toFile().delete());
     }
+
 }

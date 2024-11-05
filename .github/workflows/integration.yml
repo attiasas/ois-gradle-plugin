@@ -17,7 +17,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        branch: [main]  # Adjust branches/tags as needed
+        coreBranch: [main]  # Adjust branches/tags as needed
 
     steps:
       - uses: actions/checkout@v4
@@ -32,7 +32,7 @@ jobs:
 
       - name: SetUp ois-core
         run: |
-          git clone https://github.com/attiasas/ois-core.git --branch ${{ matrix.branch }}
+          git clone https://github.com/attiasas/ois-core.git --branch ${{ matrix.coreBranch }}
           cd ois-core
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
             ./gradlew.bat publishToMavenLocal
@@ -68,14 +68,21 @@ jobs:
           base_dir="src/test/resources/projects/state-example/build/ois/distribution"
           
           # Define directory names with required minimum count (format: "dir_name:exact_count")
-          dir_requirements=("Html:1" "Desktop:0")
+          # Root items: 1 jar, 2 dirs (Html, Desktop)
+          dir_requirements=(":3", "Html:1" "Desktop:1")
           
           # Iterate through each directory name and check conditions
           for entry in "${dir_requirements[@]}"; do
             # Split entry into name and exact_count using parameter expansion
             dir_name="${entry%%:*}"
             exact_count="${entry##*:}"
-            dir_path="$base_dir/$dir_name"
+            
+            # Determine the directory path based on whether dir_name is empty
+            if [ -z "$dir_name" ]; then
+            dir_path="$base_dir"  # Use base_dir if dir_name is empty
+            else
+            dir_path="$base_dir/$dir_name"  # Use base_dir/dir_name if dir_name is specified
+            fi
           
             # Check if the directory exists
             if [ -d "$dir_path" ]; then
