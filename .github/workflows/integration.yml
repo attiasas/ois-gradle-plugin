@@ -69,7 +69,7 @@ jobs:
           
           # Define directory names with required minimum count (format: "dir_name:exact_count")
           # Root items: 1 jar, 2 dirs (Html, Desktop)
-          dir_requirements=(":3", "Html:1" "Desktop:1")
+          dir_requirements=(":3" "Html:1" "Desktop:1")
           
           # Iterate through each directory name and check conditions
           for entry in "${dir_requirements[@]}"; do
@@ -98,7 +98,7 @@ jobs:
           
               # Check if the actual count meets or exceeds the minimum required count
               if [ "$actual_count" -eq "$exact_count" ]; then
-                echo "Directory $dir_path has the exact required count ($actual_count items):"
+                echo "Directory $dir_path has the exact required count"
               else
                 echo "Directory $dir_path does not meet the exact required count. Expected $exact_count, but found $actual_count." && exit 1
               fi
