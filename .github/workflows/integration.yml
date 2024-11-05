@@ -97,10 +97,10 @@ jobs:
               actual_count=$(find "$dir_path" -mindepth 1 \( -type f -o -type d \) | wc -l)
           
               # Check if the actual count meets or exceeds the minimum required count
-              if [ "$((actual_count - 1))" -eq "$exact_count" ]; then
-                echo "Directory $dir_path has the exact required count ($((actual_count - 1)) items):"
+              if [ "$actual_count" -eq "$exact_count" ]; then
+                echo "Directory $dir_path has the exact required count ($actual_count items):"
               else
-                echo "Directory $dir_path does not meet the exact required count. Expected $exact_count, but found $((actual_count - 1))." && exit 1
+                echo "Directory $dir_path does not meet the exact required count. Expected $exact_count, but found $actual_count." && exit 1
               fi
             else
               echo "Directory does not exist: $dir_path" && exit 1
