@@ -21,11 +21,11 @@ public class JavaFileContentReplacerTest {
     public void testGetSimulationConfigContent() throws IOException {
         // Arrange
         Path testDir = createTestDirectory();
-        Path simulationConfigPath = testDir.resolve("src/main/java/org/ois/html/SimulationConfig.java");
+        Path simulationConfigPath = testDir.resolve("src/main/java/org/ois/html/HtmlSimulationConfig.java");
         String expectedContent = """
                 package org.ois.html;
 
-                public class SimulationConfig {
+                public class HtmlSimulationConfig {
                     public static final String TITLE = "OIS";
                     public static final int SCREEN_WIDTH = 800;
                 }
