@@ -21,6 +21,11 @@ public class Const {
         public static final Version OIS_CORE_VERSION = new Version("0.1-SNAPSHOT");
     }
 
+    public static class SimulationEnvVar {
+        public static final String PROJECT_VERSION = "OIS_PROJECT_VERSION";
+        public static final String PROJECT_TITLE = "OIS_PROJECT_TITLE";
+    }
+
     /** The name of the extension object to configure the plugin **/
     public static final String PLUGIN_EXTENSION_NAME = "simulation";
     /** The name of the group the plugin tasks **/
@@ -48,6 +53,10 @@ public class Const {
         public static final String RUN_HTML_SIMULATION_TASK_NAME = "runHtml";
         /** The 'Run HTML Simulation' task description **/
         public static final String RUN_HTML_SIMULATION_TASK_DESCRIPTION = "Run the simulation as html (In dev mode), will be hosted at http://localhost:8080/";
+        /** The 'Run HTML Simulation' task name **/
+        public static final String RUN_DESKTOP_SIMULATION_TASK_NAME = "runDesktop";
+        /** The 'Run HTML Simulation' task description **/
+        public static final String RUN_DESKTOP_SIMULATION_TASK_DESCRIPTION = "Run the simulation (In dev mode) in a desktop window";
         /** The 'Distribute Simulation task name **/
         public static final String DISTRIBUTE_SIMULATION_TASK_NAME = "export";
         /** The 'Distribute Simulation task description **/

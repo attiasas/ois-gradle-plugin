@@ -68,6 +68,10 @@ public class SimulationUtils {
         return getSimulationRunnersResourcesDirectory(project).resolve(Assets.ASSETS_DIRECTORY);
     }
 
+    public static Path getSimulationRunnersIconsDirectory(Project project) {
+        return getSimulationRunnersResourcesDirectory(project).resolve("icons");
+    }
+
     public static Path getSimulationRunnersManifestFile(Project project) {
         return getSimulationRunnersResourcesDirectory(project).resolve(SimulationManifest.DEFAULT_FILE_NAME);
     }
@@ -137,6 +141,8 @@ public class SimulationUtils {
 
         public Path getHtmlRunnerDirectory() { return this.workingDirectory.resolve("html-runner"); }
 
+        public Path getDesktopRunnerDirectory() { return this.workingDirectory.resolve("desktop-runner"); }
+
         @Override
         public String toString() {
             return "SimulationRunner{" +
@@ -158,11 +164,12 @@ public class SimulationUtils {
 
     /**
      * Get the simulation runner expected environment variables required by the runners project to 'Run' a simulation.
+     * @param manifest - the simulation manifest of the project.
      * @param project - the project to get its configurations and generate the env vars.
      * @return map of environment variables used to execute 'Run simulation' task in the runner project
      */
-    public static Map<String, String> getRunSimulationTaskEnvVariables(Project project) {
-        return getDistributeSimulationTaskEnvVariables(project);
+    public static Map<String, String> getRunSimulationTaskEnvVariables(SimulationManifest manifest, Project project) {
+        return getDistributeSimulationTaskEnvVariables(manifest, project);
     }
 
     /**
@@ -171,11 +178,15 @@ public class SimulationUtils {
      * @return - the tasks to preform in order to 'Run' simulation on the given platform
      */
     public static String[] getRunnerRunSimulationGradleTasks(RunnerConfiguration.RunnerType platform) {
-        if (RunnerConfiguration.RunnerType.Html.equals(platform)) {
-            return new String[]{"run"};
-        } else {
-            throw new RuntimeException("Unsupported platform type '" + platform + "'");
+        switch (platform) {
+            case Html -> {
+                return new String[]{"serveHtml"};
+            }
+            case Desktop -> {
+                return new String[]{"run"};
+            }
         }
+        throw new RuntimeException("Unsupported platform type '" + platform + "'");
     }
 
     /**
@@ -194,8 +205,10 @@ public class SimulationUtils {
      * @param project - the project to get its configurations and generate the env vars.
      * @return map of environment variables used to execute 'Distribute simulation' task in the runner project
      */
-    public static Map<String, String> getDistributeSimulationTaskEnvVariables(Project project) {
+    public static Map<String, String> getDistributeSimulationTaskEnvVariables(SimulationManifest manifest, Project project) {
         Map<String, String> env = new HashMap<>();
+        env.put(Const.SimulationEnvVar.PROJECT_TITLE, manifest.getTitle());
+        env.put(Const.SimulationEnvVar.PROJECT_VERSION, project.getVersion().toString());
         return env;
     }
 
@@ -205,11 +218,15 @@ public class SimulationUtils {
      * @return - the tasks to preform in order to 'Distribute' simulation on the given platform
      */
     public static String[] getRunnerDistributionGradleTasks(RunnerConfiguration.RunnerType platform) {
-        if (RunnerConfiguration.RunnerType.Html.equals(platform)) {
-            return new String[]{"build"};
-        } else {
-            throw new RuntimeException("Unsupported platform type '" + platform + "'");
+        switch (platform) {
+            case Html -> {
+                return new String[]{"build"};
+            }
+            case Desktop -> {
+                return new String[]{"clean", "jpackageImage"};
+            }
         }
+        throw new RuntimeException("Unsupported platform type '" + platform + "'");
     }
 
     /**

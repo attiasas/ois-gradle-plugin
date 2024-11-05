@@ -2,9 +2,7 @@ package org.ois.plugin.utils;
 
 import org.gradle.api.GradleException;
 import org.gradle.api.invocation.Gradle;
-import org.gradle.tooling.BuildLauncher;
-import org.gradle.tooling.GradleConnector;
-import org.gradle.tooling.ProjectConnection;
+import org.gradle.tooling.*;
 import org.ois.plugin.Const;
 import org.ois.core.utils.Version;
 import org.slf4j.Logger;
@@ -38,8 +36,7 @@ public class GradleUtils {
      */
     public static void runTasks(Path workingDir, Map<String, String> environmentVariables, Logger log, String... gradleTasks) {
         try (ProjectConnection connection = GradleConnector.newConnector().forProjectDirectory(workingDir.toFile()).connect()){
-            BuildLauncher launcher = connection.newBuild()
-                    .forTasks(gradleTasks);
+            BuildLauncher launcher = connection.newBuild().forTasks(gradleTasks);
             // Set environment variables for the task execution
             launcher.setEnvironmentVariables(environmentVariables);
             // Redirect Gradle output to SLF4J logger

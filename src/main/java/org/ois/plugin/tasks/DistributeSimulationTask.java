@@ -6,16 +6,15 @@ import org.ois.core.project.SimulationManifest;
 import org.ois.core.runner.RunnerConfiguration;
 import org.ois.core.utils.io.FileUtils;
 import org.ois.core.utils.io.ZipUtils;
-import org.ois.core.utils.io.data.formats.JsonFormat;
 import org.ois.plugin.PluginConfiguration;
+import org.ois.plugin.utils.DesktopUtils;
+import org.ois.plugin.utils.HtmlUtils;
 import org.ois.plugin.utils.SimulationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Set;
 
 /**
@@ -31,21 +30,55 @@ public class DistributeSimulationTask extends DefaultTask {
     @TaskAction
     public void generateProductionArtifacts() throws IOException {
         log.info("Generating distribution artifacts");
-        Path distributionDirPath = PluginConfiguration.getCustomExportDirPath(getProject());
-        if (distributionDirPath == null) {
-            distributionDirPath = SimulationUtils.getSimulationDistributionDirectory(getProject());
-            if (FileUtils.createDirIfNotExists(distributionDirPath, true)) {
-                log.info("Created ois 'distribution' directory");
-            }
-        } else {
-            log.info("Using custom export directory {}", distributionDirPath);
-        }
+
+        Path distributionDirPath = getDistributionDirectory();
         SimulationManifest manifest = SimulationUtils.getSimulationManifest(getProject());
-        Set<RunnerConfiguration.RunnerType> platforms = manifest.getPlatforms();
-        if (platforms.contains(RunnerConfiguration.RunnerType.Html)) {
+
+        if (manifest.getPlatforms().contains(RunnerConfiguration.RunnerType.Html)) {
             log.info("Exporting HTML artifacts");
             generateHtmlArtifacts(manifest, distributionDirPath);
         }
+        if (manifest.getPlatforms().contains(RunnerConfiguration.RunnerType.Desktop)) {
+            log.info("Exporting Desktop artifacts");
+            generateDesktopArtifacts(manifest, distributionDirPath);
+        }
+        log.info("Simulation exported successfully");
+    }
+
+    /**
+     * Get the distribution directory to export the artifacts to
+     * @return a path to the directory to export the artifacts to
+     */
+    private Path getDistributionDirectory() {
+        Path distributionDirPath = PluginConfiguration.getCustomExportDirPath(getProject());
+        if (distributionDirPath == null) {
+            distributionDirPath = SimulationUtils.getSimulationDistributionDirectory(getProject());
+        } else {
+            log.info("Using custom export directory {}", distributionDirPath);
+        }
+        if (FileUtils.createDirIfNotExists(distributionDirPath, true)) {
+            log.debug("Created ois 'distribution' directory");
+        }
+        return distributionDirPath;
+    }
+
+    /**
+     * Generate the Desktop simulation artifacts in the given directory (it will create a dir named {@link RunnerConfiguration.RunnerType#Desktop})
+     * @param distributionDirPath - the directory to generate
+     * @throws IOException - in case of errors in generation
+     */
+    public void generateDesktopArtifacts(SimulationManifest manifest, Path distributionDirPath) throws IOException {
+        Path desktopDistDirPath = distributionDirPath.resolve(RunnerConfiguration.RunnerType.Desktop.name());
+        if (FileUtils.createDirIfNotExists(desktopDistDirPath, true)) {
+            log.debug("Created Desktop distribution directory");
+        }
+        SimulationUtils.distributeSimulation(getProject(), RunnerConfiguration.RunnerType.Desktop, SimulationUtils.getDistributeSimulationTaskEnvVariables(manifest, getProject()));
+        log.info("[Desktop] Collect artifacts...");
+        // Copy jar
+        FileUtils.copyDirectoryContent(SimulationUtils.getRunner(getProject()).getDesktopRunnerDirectory().resolve("build").resolve("libs"), distributionDirPath);
+        // Zip application
+        ZipUtils.zipItems(desktopDistDirPath.resolve(manifest.getTitle() + ".zip"), DesktopUtils.getDesktopFilesToZip(getProject()));
+        log.info("[Desktop] Artifacts generated successfully at {}", desktopDistDirPath);
     }
 
     /**
@@ -56,26 +89,11 @@ public class DistributeSimulationTask extends DefaultTask {
     public void generateHtmlArtifacts(SimulationManifest manifest, Path distributionDirPath) throws IOException {
         Path htmlDistDirPath = distributionDirPath.resolve(RunnerConfiguration.RunnerType.Html.name());
         if (FileUtils.createDirIfNotExists(htmlDistDirPath, true)) {
-            log.info("Created html distribution directory");
+            log.debug("Created Html distribution directory");
         }
-        SimulationUtils.distributeSimulation(getProject(), RunnerConfiguration.RunnerType.Html, SimulationUtils.getDistributeSimulationTaskEnvVariables(getProject()));
+        SimulationUtils.distributeSimulation(getProject(), RunnerConfiguration.RunnerType.Html, SimulationUtils.getDistributeSimulationTaskEnvVariables(manifest, getProject()));
         log.info("[HTML] Collect artifacts...");
-        ZipUtils.zipItems(htmlDistDirPath.resolve(manifest.getTitle() + ".zip"), getHtmlFilesToZip());
+        ZipUtils.zipItems(htmlDistDirPath.resolve(manifest.getTitle() + ".zip"), HtmlUtils.getHtmlFilesToZip(getProject()));
         log.info("[HTML] Artifacts generated successfully at {}", htmlDistDirPath);
-    }
-
-    /**
-     * Get the list of artifacts to zip for HTML distribution
-     * @return - list of files and directories to zip
-     */
-    private Path[] getHtmlFilesToZip() {
-        Path webappDir = SimulationUtils.getRunner(getProject()).getHtmlRunnerDirectory().resolve("build").resolve("dist").resolve("webapp");
-        File[] files = webappDir.toFile().listFiles();
-        if (files == null || files.length == 0) {
-            throw new RuntimeException("[HTML] Can't find any artifacts to zip");
-        }
-        Path[] filePaths = Arrays.stream(files).map(File::toPath).toArray(Path[]::new);
-        log.debug("files to zip: {}", Arrays.toString(filePaths));
-        return filePaths;
     }
 }
