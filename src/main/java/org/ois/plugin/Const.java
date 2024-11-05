@@ -22,7 +22,6 @@ public class Const {
     }
 
     public static class SimulationEnvVar {
-        public static final String PROJECT_GROUP = "OIS_PROJECT_GROUP";
         public static final String PROJECT_VERSION = "OIS_PROJECT_VERSION";
         public static final String PROJECT_TITLE = "OIS_PROJECT_TITLE";
     }

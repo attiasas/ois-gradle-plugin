@@ -209,7 +209,6 @@ public class SimulationUtils {
         Map<String, String> env = new HashMap<>();
         env.put(Const.SimulationEnvVar.PROJECT_TITLE, manifest.getTitle());
         env.put(Const.SimulationEnvVar.PROJECT_VERSION, project.getVersion().toString());
-        env.put(Const.SimulationEnvVar.PROJECT_GROUP, project.getGroup().toString());
         return env;
     }
 
