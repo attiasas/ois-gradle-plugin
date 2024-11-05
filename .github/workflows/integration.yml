@@ -94,7 +94,7 @@ jobs:
               fi
           
               # Count files and directories within the current directory
-              actual_count=$(find "$dir_path" -mindepth 1 \( -type f -o -type d \) | wc -l)
+              actual_count=$(ls -1A "$dir_path" | wc -l)
           
               # Check if the actual count meets or exceeds the minimum required count
               if [ "$actual_count" -eq "$exact_count" ]; then
