@@ -9,9 +9,16 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.List;
 
 public class DesktopUtils {
     private static final Logger log = LoggerFactory.getLogger(DesktopUtils.class);
+
+    public static final List<String> icons = List.of(
+            "icon32.png", "icon32.ico", "icon32.icns",
+            "icon128.png", "icon128.ico", "icon128.icns",
+            "logo.png"
+    );
 
     /**
      * Retrieves the content of the DesktopSimulationConfig.java file for the Desktop runner.

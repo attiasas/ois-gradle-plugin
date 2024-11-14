@@ -46,9 +46,9 @@ public class SimulationPlugin implements Plugin<Project> {
         TaskUtils.addCleanTask(target);
         TaskProvider<ValidateProjectTask> validationTask = TaskUtils.addProjectValidationTask(target);
         TaskProvider<PrepareSimulationTask> prepareSimulationTask = TaskUtils.addPrepareSimulationTask(target, validationTask);
-
         TaskUtils.addRunDesktopSimulationTask(target, prepareSimulationTask);
         TaskUtils.addRunHtmlSimulationTask(target, prepareSimulationTask);
+        TaskUtils.addRunAndroidSimulationTask(target, prepareSimulationTask);
 
         TaskUtils.addDistributeSimulationTask(target, prepareSimulationTask);
     }

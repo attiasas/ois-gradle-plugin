@@ -1,7 +1,7 @@
 package org.ois.plugin;
 
 import org.ois.core.utils.io.FileUtils;
-import org.ois.plugin.tools.JavaFileContentReplacer;
+import org.ois.plugin.tools.FileContentReplacer;
 import org.ois.plugin.utils.HtmlUtils;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
@@ -48,7 +48,7 @@ public class JavaFileContentReplacerTest {
     @Test(dataProvider = "updateConfigProvider")
     public void testGetUpdateConfigFileContent(String originalContent, Map<String, Object> attributeMap, String expectedUpdatedContent) {
         // Act
-        String actualUpdatedContent = JavaFileContentReplacer.replaceJavaStaticFinalVals(originalContent, attributeMap);
+        String actualUpdatedContent = FileContentReplacer.Java.replaceJavaStaticFinalVals(originalContent, attributeMap);
 
         // Assert
         Assert.assertEquals(actualUpdatedContent.trim(), expectedUpdatedContent.trim());
@@ -72,7 +72,7 @@ public class JavaFileContentReplacerTest {
         ));
 
         // Act
-        JavaFileContentReplacer.replaceJavaStaticFinalVals(originalContent, attributeMap); // Should throw exception
+        FileContentReplacer.Java.replaceJavaStaticFinalVals(originalContent, attributeMap); // Should throw exception
     }
 
     @DataProvider(name = "updateConfigProvider")

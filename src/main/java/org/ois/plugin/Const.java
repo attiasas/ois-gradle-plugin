@@ -22,7 +22,9 @@ public class Const {
     }
 
     public static class SimulationEnvVar {
+        public static final String PROJECT_GROUP = "OIS_PROJECT_GROUP";
         public static final String PROJECT_VERSION = "OIS_PROJECT_VERSION";
+        public static final String PROJECT_VERSION_NUMBER = "OIS_PROJECT_VERSION_NUMBER";
         public static final String PROJECT_TITLE = "OIS_PROJECT_TITLE";
     }
 
@@ -53,10 +55,14 @@ public class Const {
         public static final String RUN_HTML_SIMULATION_TASK_NAME = "runHtml";
         /** The 'Run HTML Simulation' task description **/
         public static final String RUN_HTML_SIMULATION_TASK_DESCRIPTION = "Run the simulation as html (In dev mode), will be hosted at http://localhost:8080/";
-        /** The 'Run HTML Simulation' task name **/
+        /** The 'Run Desktop Simulation' task name **/
         public static final String RUN_DESKTOP_SIMULATION_TASK_NAME = "runDesktop";
-        /** The 'Run HTML Simulation' task description **/
+        /** The 'Run Desktop Simulation' task description **/
         public static final String RUN_DESKTOP_SIMULATION_TASK_DESCRIPTION = "Run the simulation (In dev mode) in a desktop window";
+        /** The 'Run Android Simulation' task name **/
+        public static final String RUN_ANDROID_SIMULATION_TASK_NAME = "runAndroid";
+        /** The 'Run Android Simulation' task description **/
+        public static final String RUN_ANDROID_SIMULATION_TASK_DESCRIPTION = "Run the simulation (In dev mode) in connected android device";
         /** The 'Distribute Simulation task name **/
         public static final String DISTRIBUTE_SIMULATION_TASK_NAME = "export";
         /** The 'Distribute Simulation task description **/

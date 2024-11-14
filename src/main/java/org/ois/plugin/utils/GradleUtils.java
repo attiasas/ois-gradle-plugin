@@ -34,17 +34,27 @@ public class GradleUtils {
      * @param log - the gradle tasks will output their logs to it.
      * @param gradleTasks - the tasks to run
      */
-    public static void runTasks(Path workingDir, Map<String, String> environmentVariables, Logger log, String... gradleTasks) {
+    public static void runTasks(Path workingDir, Map<String, String> environmentVariables, Logger log, boolean oneByOne, String... gradleTasks) {
         try (ProjectConnection connection = GradleConnector.newConnector().forProjectDirectory(workingDir.toFile()).connect()){
-            BuildLauncher launcher = connection.newBuild().forTasks(gradleTasks);
-            // Set environment variables for the task execution
-            launcher.setEnvironmentVariables(environmentVariables);
-            // Redirect Gradle output to SLF4J logger
-            launcher.setStandardOutput(LogUtils.getRedirectOutToLogInfo(log));
-            launcher.setStandardError(LogUtils.getRedirectOutToLogErr(log));
-            // Run
-            launcher.setStandardInput(System.in);
-            launcher.run();
+            if (!oneByOne) {
+                getBuildLauncher(connection, environmentVariables, log, gradleTasks).run();
+                return;
+            }
+            for (String task : gradleTasks) {
+                getBuildLauncher(connection, environmentVariables, log, task).run();
+            }
         }
+    }
+
+    private static BuildLauncher getBuildLauncher(ProjectConnection connection, Map<String, String> environmentVariables, Logger log, String... gradleTasks) {
+        BuildLauncher launcher = connection.newBuild().forTasks(gradleTasks);
+        // Set environment variables for the task execution
+        launcher.setEnvironmentVariables(environmentVariables);
+        // Redirect Gradle output to SLF4J logger
+        launcher.setStandardOutput(LogUtils.getRedirectOutToLogInfo(log));
+        launcher.setStandardError(LogUtils.getRedirectOutToLogErr(log));
+        // Run
+        launcher.setStandardInput(System.in);
+        return launcher;
     }
 }
