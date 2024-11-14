@@ -23,9 +23,3 @@ repositories {
     mavenCentral()
     mavenLocal()
 }
-
-simulation {
-    runner {
-        runnerVersion = "support_android"
-    }
-}
