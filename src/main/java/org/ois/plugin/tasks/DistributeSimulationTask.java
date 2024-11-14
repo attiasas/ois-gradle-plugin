@@ -7,6 +7,7 @@ import org.ois.core.runner.RunnerConfiguration;
 import org.ois.core.utils.io.FileUtils;
 import org.ois.core.utils.io.ZipUtils;
 import org.ois.plugin.PluginConfiguration;
+import org.ois.plugin.utils.AndroidUtils;
 import org.ois.plugin.utils.DesktopUtils;
 import org.ois.plugin.utils.HtmlUtils;
 import org.ois.plugin.utils.SimulationUtils;
@@ -41,6 +42,10 @@ public class DistributeSimulationTask extends DefaultTask {
         if (manifest.getPlatforms().contains(RunnerConfiguration.RunnerType.Desktop)) {
             log.info("Exporting Desktop artifacts");
             generateDesktopArtifacts(manifest, distributionDirPath);
+        }
+        if (manifest.getPlatforms().contains(RunnerConfiguration.RunnerType.Android)) {
+            log.info("Exporting Android artifacts");
+            generateAndroidArtifacts(manifest, distributionDirPath);
         }
         log.info("Simulation exported successfully");
     }
@@ -95,5 +100,16 @@ public class DistributeSimulationTask extends DefaultTask {
         log.info("[HTML] Collect artifacts...");
         ZipUtils.zipItems(htmlDistDirPath.resolve(manifest.getTitle() + ".zip"), HtmlUtils.getHtmlFilesToZip(getProject()));
         log.info("[HTML] Artifacts generated successfully at {}", htmlDistDirPath);
+    }
+
+    public void generateAndroidArtifacts(SimulationManifest manifest, Path distributionDirPath) throws IOException {
+        Path androidDistDirPath = distributionDirPath.resolve(RunnerConfiguration.RunnerType.Android.name());
+        if (FileUtils.createDirIfNotExists(androidDistDirPath, true)) {
+            log.debug("Created Android distribution directory");
+        }
+        SimulationUtils.distributeSimulation(getProject(), RunnerConfiguration.RunnerType.Android, SimulationUtils.getDistributeSimulationTaskEnvVariables(manifest, getProject()));
+        log.info("[Android] Collection artifacts...");
+        ZipUtils.zipItems(androidDistDirPath.resolve(manifest.getTitle() + ".zip"), AndroidUtils.getAndroidFilesToZip(getProject()));
+        log.info("[Android] Artifacts generated successfully at {}", androidDistDirPath);
     }
 }

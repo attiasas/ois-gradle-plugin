@@ -90,6 +90,21 @@ public class TaskUtils {
     }
 
     /**
+     * Register OIS-run-android-simulation task to the project if not already registered.
+     * Prepare the environment required for the OIS simulation actions
+     * @param project - the project to register the task to
+     * @param prepareSimulationTask- the required task before this
+     */
+    public static void addRunAndroidSimulationTask(Project project, TaskProvider<PrepareSimulationTask> prepareSimulationTask) {
+        try {
+            project.getTasks().named(Const.Tasks.RUN_ANDROID_SIMULATION_TASK_NAME, RunAndroidSimulationTask.class);
+            return;
+        } catch (UnknownTaskException ignored) {}
+        TaskProvider<RunAndroidSimulationTask> task = registerTaskInProject(Const.Tasks.RUN_ANDROID_SIMULATION_TASK_NAME, RunAndroidSimulationTask.class, Const.Tasks.RUN_ANDROID_SIMULATION_TASK_DESCRIPTION, project);
+        task.configure(runSimulationTask -> runSimulationTask.dependsOn(prepareSimulationTask));
+    }
+
+    /**
      * Register Distribute-Simulation task to the project if not already registered.
      * Generate the production artifacts for each configured platforms, ready to distribute.
      * @param project - the project to register the task to

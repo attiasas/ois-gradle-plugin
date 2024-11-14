@@ -69,7 +69,7 @@ jobs:
           
           # Define directory names with required minimum count (format: "dir_name:exact_count")
           # Root items: 1 jar, 2 dirs (Html, Desktop)
-          dir_requirements=(":3" "Html:1" "Desktop:1")
+          dir_requirements=(":4" "Html:1" "Desktop:1" "Android:1")
           
           # Iterate through each directory name and check conditions
           for entry in "${dir_requirements[@]}"; do

@@ -143,6 +143,8 @@ public class SimulationUtils {
 
         public Path getDesktopRunnerDirectory() { return this.workingDirectory.resolve("desktop-runner"); }
 
+        public Path getAndroidRunnerDirectory() { return this.workingDirectory.resolve("android-runner"); }
+
         @Override
         public String toString() {
             return "SimulationRunner{" +
@@ -185,6 +187,9 @@ public class SimulationUtils {
             case Desktop -> {
                 return new String[]{"run"};
             }
+            case Android -> {
+                return new String[]{"installDebug", "runAndroid"};
+            }
         }
         throw new RuntimeException("Unsupported platform type '" + platform + "'");
     }
@@ -197,7 +202,7 @@ public class SimulationUtils {
      */
     public static void runSimulation(Project project, RunnerConfiguration.RunnerType platform, Map<String, String> envVariables) {
         envVariables.putAll(System.getenv());
-        GradleUtils.runTasks(getRunner(project).workingDirectory, envVariables, log, getRunnerRunSimulationGradleTasks(platform));
+        GradleUtils.runTasks(getRunner(project).workingDirectory, envVariables, log, RunnerConfiguration.RunnerType.Android.equals(platform), getRunnerRunSimulationGradleTasks(platform));
     }
 
     /**
@@ -209,6 +214,8 @@ public class SimulationUtils {
         Map<String, String> env = new HashMap<>();
         env.put(Const.SimulationEnvVar.PROJECT_TITLE, manifest.getTitle());
         env.put(Const.SimulationEnvVar.PROJECT_VERSION, project.getVersion().toString());
+        env.put(Const.SimulationEnvVar.PROJECT_VERSION_NUMBER, String.valueOf(((Map<String,Object>) project.getProperties()).getOrDefault("versionCode", 1)));
+        env.put(Const.SimulationEnvVar.PROJECT_GROUP, project.getGroup().toString());
         return env;
     }
 
@@ -223,7 +230,10 @@ public class SimulationUtils {
                 return new String[]{"build"};
             }
             case Desktop -> {
-                return new String[]{"clean", "jpackageImage"};
+                return new String[]{"jpackageImage"};
+            }
+            case Android -> {
+                return new String[]{"packageRelease"};
             }
         }
         throw new RuntimeException("Unsupported platform type '" + platform + "'");
@@ -237,6 +247,6 @@ public class SimulationUtils {
      */
     public static void distributeSimulation(Project project, RunnerConfiguration.RunnerType platform, Map<String, String> envVariables) {
         envVariables.putAll(System.getenv());
-        GradleUtils.runTasks(getRunner(project).workingDirectory, envVariables, log, getRunnerDistributionGradleTasks(platform));
+        GradleUtils.runTasks(getRunner(project).workingDirectory, envVariables, log, false, getRunnerDistributionGradleTasks(platform));
     }
 }
