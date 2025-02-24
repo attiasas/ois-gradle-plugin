@@ -105,10 +105,17 @@ public class PrepareSimulationTask extends DefaultTask {
             projectSimulationDir = SimulationUtils.getProjectSimulationConfigDirectory(project);
         }
         log.debug("Project simulation directory: {}", projectSimulationDir);
+        // Copy files from assets directory in simulation dir
         Path projectAssetsDir = projectSimulationDir.resolve(Assets.ASSETS_DIRECTORY);
         if (projectAssetsDir.toFile().exists() && projectAssetsDir.toFile().isDirectory()) {
             log.debug("'assets' directory located, copy content");
             FileUtils.copyDirectoryContent(projectAssetsDir, SimulationUtils.getSimulationRunnersAssetsDirectory(project));
+        }
+        // Copy files from resources directory in the project
+        Path projectResourceDir = SimulationUtils.getProjectResourcesDirectory(project);
+        if (projectResourceDir.toFile().exists() && projectResourceDir.toFile().isDirectory()) {
+            log.debug("'resources' directory located, copy content");
+            FileUtils.copyDirectoryContent(projectResourceDir, SimulationUtils.getSimulationRunnersAssetsDirectory(project));
         }
         // Prepare Icons
         prepareIcons(runner, projectSimulationDir);

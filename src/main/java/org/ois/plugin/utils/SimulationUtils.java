@@ -42,6 +42,15 @@ public class SimulationUtils {
     }
 
     /**
+     * Get the 'resources' directory path of the project
+     * @param project - the OIS project
+     * @return the path to its 'resources' directory
+     */
+    public static Path getProjectResourcesDirectory(Project project) {
+        return project.getProjectDir().toPath().resolve("src").resolve("main").resolve("resources");
+    }
+
+    /**
      * Get the 'ois' directory path for the project, the main directory generated and used by the plugin tasks.
      * @param project - the OIS project
      * @return the path to its 'ois' directory
