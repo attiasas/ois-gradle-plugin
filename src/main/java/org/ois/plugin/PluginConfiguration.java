@@ -17,6 +17,11 @@ public class PluginConfiguration {
     private String logLevel;
     /** If exists, it will filter the logs with topics to only show the provided **/
     private String[] logTopics;
+    /** If exists and true, the engine will run the project in debug mode **/
+    private boolean debugMode;
+    /** If exists and not blank, the engine will run the project in dev mode **/
+    private String devModeDir;
+
     /** OIS Runners configurations **/
     private RunnerConfig runner;
     /** OIS Project configurations **/
@@ -140,6 +145,10 @@ public class PluginConfiguration {
         return logTopics;
     }
 
+    public boolean getDebugMode() { return debugMode; }
+
+    public String getDevModeDir() { return devModeDir; }
+
     public void setLogLevel(String logLevel) {
         this.logLevel = logLevel;
     }
@@ -147,6 +156,10 @@ public class PluginConfiguration {
     public void setLogTopics(String[] logTopics) {
         this.logTopics = logTopics;
     }
+
+    public void setDebugMode(boolean debugMode) { this.debugMode = debugMode; }
+
+    public void setDevModeDir(String devModeDir) { this.devModeDir = devModeDir; }
 
     // Static getters and Default object generator by project
 
@@ -237,6 +250,23 @@ public class PluginConfiguration {
             return null;
         }
         return logTopics;
+    }
+
+    public static boolean getDebugMode(Project project) {
+        if (Boolean.parseBoolean(System.getProperty(Const.DevModeVars.DEBUG_MODE,"false"))) {
+            // System property overrides project config
+            return true;
+        }
+        return getPluginConfigurations(project).getDebugMode();
+    }
+
+    public static String getDevModeDir(Project project) {
+        String devModeDir = System.getProperty(Const.DevModeVars.DEV_MODE_DIR, "");
+        if (!devModeDir.isEmpty()) {
+            // System property overrides project config
+            return devModeDir;
+        }
+        return getPluginConfigurations(project).getDevModeDir();
     }
 
     public static Path getCustomExportDirPath(Project project) {

@@ -165,7 +165,8 @@ public class PrepareSimulationTask extends DefaultTask {
                 "TITLE", manifest.getTitle(),
                 "SCREEN_WIDTH", manifest.getScreenWidth(),
                 "SCREEN_HEIGHT", manifest.getScreenHeight(),
-                "LOG_LEVEL", PluginConfiguration.getLogLevel(project)
+                "LOG_LEVEL", PluginConfiguration.getLogLevel(project),
+                "DEBUG_MODE", PluginConfiguration.getDebugMode(project)
         ));
         String[] logTopics = PluginConfiguration.getLogTopics(project);
         if (logTopics != null) {
@@ -187,10 +188,17 @@ public class PrepareSimulationTask extends DefaultTask {
 
     private void prepareDesktopResources(Project project, SimulationUtils.SimulationRunner runner) throws IOException {
         // Attributes to inject
-        Map<String, Object> desktopSimulationConfigFileAttributes = new Hashtable<>(Map.of("LOG_LEVEL", PluginConfiguration.getLogLevel(project)));
+        Map<String, Object> desktopSimulationConfigFileAttributes = new Hashtable<>(Map.of(
+                "LOG_LEVEL", PluginConfiguration.getLogLevel(project),
+                "DEBUG_MODE", PluginConfiguration.getDebugMode(project)
+        ));
         String[] logTopics = PluginConfiguration.getLogTopics(project);
         if (logTopics != null) {
             desktopSimulationConfigFileAttributes.put("LOG_TOPICS", logTopics);
+        }
+        String devModeDir = PluginConfiguration.getDevModeDir(project);
+        if (devModeDir != null && !devModeDir.isBlank()) {
+            desktopSimulationConfigFileAttributes.put("DEV_MODE_DIR", devModeDir);
         }
         // Generate new content with injected values
         String updatedContent = FileContentReplacer.Java.replaceJavaStaticFinalVals(DesktopUtils.getSimulationConfigContent(runner.getDesktopRunnerDirectory()), desktopSimulationConfigFileAttributes);
@@ -200,7 +208,10 @@ public class PrepareSimulationTask extends DefaultTask {
 
     private void prepareAndroidResources(Project project, SimulationUtils.SimulationRunner runner, SimulationManifest manifest) throws IOException {
         // Attributes to inject
-        Map<String, Object> androidSimulationConfigFileAttributes = new Hashtable<>(Map.of("LOG_LEVEL", PluginConfiguration.getLogLevel(project)));
+        Map<String, Object> androidSimulationConfigFileAttributes = new Hashtable<>(Map.of(
+                "LOG_LEVEL", PluginConfiguration.getLogLevel(project),
+                "DEBUG_MODE", PluginConfiguration.getDebugMode(project)
+        ));
         String[] logTopics = PluginConfiguration.getLogTopics(project);
         if (logTopics != null) {
             androidSimulationConfigFileAttributes.put("LOG_TOPICS", logTopics);

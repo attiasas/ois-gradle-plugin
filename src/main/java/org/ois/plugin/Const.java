@@ -28,6 +28,13 @@ public class Const {
         public static final String PROJECT_TITLE = "OIS_PROJECT_TITLE";
     }
 
+    public static class DevModeVars {
+        /** The system property that can indicate to the tasks to use engine in debug mode, provided -Dproperty flag to task **/
+        public static final String DEBUG_MODE = "org.ois.runner.debugMode";
+        /** The system property that can indicate to the tasks to use engine in dev mode (only relevant for desktop), provided -Dproperty  flag to task **/
+        public static final String DEV_MODE_DIR = "org.ois.runner.devModeDir";
+    }
+
     /** The name of the extension object to configure the plugin **/
     public static final String PLUGIN_EXTENSION_NAME = "simulation";
     /** The name of the group the plugin tasks **/

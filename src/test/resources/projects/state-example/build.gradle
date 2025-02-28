@@ -23,3 +23,9 @@ repositories {
     mavenCentral()
     mavenLocal()
 }
+
+//simulation {
+//    runner {
+//        runnerVersion = "dev_mode"
+//    }
+//}
