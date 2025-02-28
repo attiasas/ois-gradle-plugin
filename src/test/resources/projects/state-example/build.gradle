@@ -24,8 +24,8 @@ repositories {
     mavenLocal()
 }
 
-simulation {
-    runner {
-        runnerVersion = "dev_mode"
-    }
-}
+//simulation {
+//    runner {
+//        runnerVersion = "dev_mode"
+//    }
+//}

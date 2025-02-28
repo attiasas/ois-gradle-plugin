@@ -18,7 +18,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest, windows-latest, macOS-latest ]
-        coreBranch: [dev_mode]  # Adjust branches/tags as needed
+        coreBranch: [main]  # Adjust branches/tags as needed
     steps:
       - uses: actions/checkout@v4
         with:
