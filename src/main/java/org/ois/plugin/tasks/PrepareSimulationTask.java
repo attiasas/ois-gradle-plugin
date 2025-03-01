@@ -105,6 +105,21 @@ public class PrepareSimulationTask extends DefaultTask {
             projectSimulationDir = SimulationUtils.getProjectSimulationConfigDirectory(project);
         }
         log.debug("Project simulation directory: {}", projectSimulationDir);
+        // Prepare Assets
+        prepareAssets(project, projectSimulationDir);
+        // Prepare Entities information
+        prepareEntitiesResources(project, projectSimulationDir);
+        // Prepare Icons
+        prepareIcons(runner, projectSimulationDir);
+        // Create simulation manifest that will be used by runners
+        return transferManifestToRunner(projectSimulationDir);
+    }
+
+    private void prepareEntitiesResources(Project project, Path projectSimulationDir) throws IOException {
+
+    }
+
+    private void prepareAssets(Project project, Path projectSimulationDir) throws IOException {
         // Copy files from assets directory in simulation dir
         Path projectAssetsDir = projectSimulationDir.resolve(Assets.ASSETS_DIRECTORY);
         if (projectAssetsDir.toFile().exists() && projectAssetsDir.toFile().isDirectory()) {
@@ -117,10 +132,6 @@ public class PrepareSimulationTask extends DefaultTask {
             log.debug("'resources' directory located, copy content");
             FileUtils.copyDirectoryContent(projectResourceDir, SimulationUtils.getSimulationRunnersAssetsDirectory(project));
         }
-        // Prepare Icons
-        prepareIcons(runner, projectSimulationDir);
-        // Create simulation manifest that will be used by runners
-        return transferManifestToRunner(projectSimulationDir);
     }
 
     private void prepareIcons(SimulationUtils.SimulationRunner runner, Path projectSimulationDir) throws IOException {
