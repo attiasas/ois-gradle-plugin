@@ -2,6 +2,7 @@ package org.ois.plugin.utils;
 
 import org.gradle.api.Project;
 import org.ois.core.project.Assets;
+import org.ois.core.project.Entities;
 import org.ois.core.project.SimulationManifest;
 import org.ois.core.runner.RunnerConfiguration;
 import org.ois.core.utils.io.data.formats.JsonFormat;
@@ -75,6 +76,15 @@ public class SimulationUtils {
      */
     public static Path getSimulationRunnersAssetsDirectory(Project project) {
         return getSimulationRunnersResourcesDirectory(project).resolve(Assets.ASSETS_DIRECTORY);
+    }
+
+    /**
+     * Get the 'entities' directory path, contains all the assets of the project simulation.
+     * @param project - the OIS project
+     * @return the path to its 'entities' directory
+     */
+    public static Path getSimulationRunnersEntitiesDirectory(Project project) {
+        return getSimulationRunnersResourcesDirectory(project).resolve(Entities.ENTITIES_DIRECTORY);
     }
 
     public static Path getSimulationRunnersIconsDirectory(Project project) {

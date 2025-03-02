@@ -6,32 +6,36 @@ import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
 import org.gradle.api.tasks.TaskAction;
 import org.ois.core.project.Assets;
+import org.ois.core.project.Entities;
 import org.ois.core.project.SimulationManifest;
 import org.ois.core.runner.RunnerConfiguration;
 import org.ois.core.utils.io.FileUtils;
 import org.ois.core.utils.io.data.formats.JsonFormat;
 import org.ois.plugin.Const;
 import org.ois.plugin.PluginConfiguration;
+import org.ois.plugin.entities.ProjectEntities;
 import org.ois.plugin.tools.IconHandler;
 import org.ois.plugin.tools.FileContentReplacer;
 import org.ois.plugin.utils.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Make sure the needed components for the deployer are ready to be used for running/debugging/exporting the OIS project
  */
 public class PrepareSimulationTask extends DefaultTask {
     private static final Logger log = LoggerFactory.getLogger(PrepareSimulationTask.class);
+
+    private final ProjectEntities projectEntities = new ProjectEntities();
 
     /**
      * Prepare the components and environment for OIS simulation actions
@@ -94,17 +98,18 @@ public class PrepareSimulationTask extends DefaultTask {
     }
 
     private SimulationManifest prepareResources(SimulationUtils.SimulationRunner runner, Project project) throws IOException, URISyntaxException {
+        // Prepare base target directory
         Path oisResourcesDirPath = SimulationUtils.getSimulationRunnersResourcesDirectory(project);
         if (FileUtils.createDirIfNotExists(oisResourcesDirPath, true)) {
             log.debug("Created ois simulation 'resources' directory");
         }
-        log.info("Copy project simulation resources...");
+        log.info("Preparing project simulation resources...");
         // Copy project assets
         Path projectSimulationDir = PluginConfiguration.getCustomSimulationDirPath(project);
         if (projectSimulationDir == null) {
             projectSimulationDir = SimulationUtils.getProjectSimulationConfigDirectory(project);
         }
-        log.debug("Project simulation directory: {}", projectSimulationDir);
+        log.debug("Project simulation source directory: {}", projectSimulationDir);
         // Prepare Assets
         prepareAssets(project, projectSimulationDir);
         // Prepare Entities information
@@ -116,7 +121,17 @@ public class PrepareSimulationTask extends DefaultTask {
     }
 
     private void prepareEntitiesResources(Project project, Path projectSimulationDir) throws IOException {
-
+        // Check if entities blueprints are provided by the project
+        Path projectEntitiesDir = projectSimulationDir.resolve(Entities.ENTITIES_DIRECTORY);
+        if (!projectEntitiesDir.toFile().exists() || !projectEntitiesDir.toFile().isDirectory()) {
+            return;
+        }
+        log.debug("'entities' directory located, copy content");
+        FileUtils.copyDirectoryContent(projectEntitiesDir, SimulationUtils.getSimulationRunnersEntitiesDirectory(project));
+        try {
+            List<File> entitiesBlueprintDirs = Arrays.stream(Objects.requireNonNull(projectEntitiesDir.toFile().listFiles())).filter(File::isDirectory).toList();
+            log.info(String.format("located '%d' entity blueprints", entitiesBlueprintDirs.size()));
+        } catch (Exception ignored) {}
     }
 
     private void prepareAssets(Project project, Path projectSimulationDir) throws IOException {
