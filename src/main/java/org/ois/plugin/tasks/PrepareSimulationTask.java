@@ -8,6 +8,7 @@ import org.gradle.api.tasks.TaskAction;
 import org.ois.core.project.Assets;
 import org.ois.core.project.Entities;
 import org.ois.core.project.SimulationManifest;
+import org.ois.core.project.States;
 import org.ois.core.runner.RunnerConfiguration;
 import org.ois.core.utils.io.FileUtils;
 import org.ois.core.utils.io.data.formats.JsonFormat;
@@ -114,24 +115,12 @@ public class PrepareSimulationTask extends DefaultTask {
         prepareAssets(project, projectSimulationDir);
         // Prepare Entities information
         prepareEntitiesResources(project, projectSimulationDir);
+        // Prepare States information
+        prepareStatesResources(project, projectSimulationDir);
         // Prepare Icons
         prepareIcons(runner, projectSimulationDir);
         // Create simulation manifest that will be used by runners
         return transferManifestToRunner(projectSimulationDir);
-    }
-
-    private void prepareEntitiesResources(Project project, Path projectSimulationDir) throws IOException {
-        // Check if entities blueprints are provided by the project
-        Path projectEntitiesDir = projectSimulationDir.resolve(Entities.ENTITIES_DIRECTORY);
-        if (!projectEntitiesDir.toFile().exists() || !projectEntitiesDir.toFile().isDirectory()) {
-            return;
-        }
-        log.debug("'entities' directory located, copy content");
-        FileUtils.copyDirectoryContent(projectEntitiesDir, SimulationUtils.getSimulationRunnersEntitiesDirectory(project));
-        try {
-            List<File> entitiesBlueprintDirs = Arrays.stream(Objects.requireNonNull(projectEntitiesDir.toFile().listFiles())).filter(File::isDirectory).toList();
-            log.info(String.format("located '%d' entity blueprints", entitiesBlueprintDirs.size()));
-        } catch (Exception ignored) {}
     }
 
     private void prepareAssets(Project project, Path projectSimulationDir) throws IOException {
@@ -147,6 +136,32 @@ public class PrepareSimulationTask extends DefaultTask {
             log.debug("'resources' directory located, copy content");
             FileUtils.copyDirectoryContent(projectResourceDir, SimulationUtils.getSimulationRunnersAssetsDirectory(project));
         }
+    }
+
+    private void prepareEntitiesResources(Project project, Path projectSimulationDir) throws IOException {
+        // Check if entities blueprints are provided by the project
+        Path projectEntitiesDir = projectSimulationDir.resolve(Entities.ENTITIES_DIRECTORY);
+        if (!projectEntitiesDir.toFile().exists() || !projectEntitiesDir.toFile().isDirectory()) {
+            return;
+        }
+        log.debug("'entities' directory located, copy content");
+        FileUtils.copyDirectoryContent(projectEntitiesDir, SimulationUtils.getSimulationRunnersEntitiesDirectory(project));
+        try {
+            List<String> entitiesBlueprintDirs = Arrays.stream(Objects.requireNonNull(projectEntitiesDir.toFile().listFiles())).filter(File::isDirectory).map(file -> file.toPath().toString()).toList();
+            log.info(String.format("located '%d' entity blueprints: %s", entitiesBlueprintDirs.size(), entitiesBlueprintDirs));
+        } catch (Exception ignored) {}
+    }
+
+    private void prepareStatesResources(Project project, Path projectSimulationDir) throws IOException {
+        Path projectStatesDir = projectSimulationDir.resolve(States.STATES_DIRECTORY);
+        if (!projectStatesDir.toFile().exists() || !projectStatesDir.toFile().isDirectory()) {
+            return;
+        }
+        FileUtils.copyDirectoryContent(projectStatesDir, SimulationUtils.getSimulationRunnersStatesDirectory(project));
+        try {
+            List<String> statesManifests = Arrays.stream(Objects.requireNonNull(projectStatesDir.toFile().listFiles())).filter(File::isDirectory).map(file -> file.toPath().toString()).toList();
+            log.info(String.format("located '%d' state manifests: %s", statesManifests.size(), statesManifests));
+        } catch (Exception ignored) {}
     }
 
     private void prepareIcons(SimulationUtils.SimulationRunner runner, Path projectSimulationDir) throws IOException {
