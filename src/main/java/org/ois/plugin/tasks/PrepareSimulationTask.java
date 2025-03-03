@@ -147,7 +147,7 @@ public class PrepareSimulationTask extends DefaultTask {
         log.debug("'entities' directory located, copy content");
         FileUtils.copyDirectoryContent(projectEntitiesDir, SimulationUtils.getSimulationRunnersEntitiesDirectory(project));
         try {
-            List<String> entitiesBlueprintDirs = Arrays.stream(Objects.requireNonNull(projectEntitiesDir.toFile().listFiles())).filter(File::isDirectory).map(file -> file.toPath().toString()).toList();
+            List<String> entitiesBlueprintDirs = Arrays.stream(Objects.requireNonNull(projectEntitiesDir.toFile().listFiles())).filter(File::isDirectory).map(File::getName).toList();
             log.info(String.format("located '%d' entity blueprints: %s", entitiesBlueprintDirs.size(), entitiesBlueprintDirs));
         } catch (Exception ignored) {}
     }
@@ -159,7 +159,7 @@ public class PrepareSimulationTask extends DefaultTask {
         }
         FileUtils.copyDirectoryContent(projectStatesDir, SimulationUtils.getSimulationRunnersStatesDirectory(project));
         try {
-            List<String> statesManifests = Arrays.stream(Objects.requireNonNull(projectStatesDir.toFile().listFiles())).filter(File::isDirectory).map(file -> file.toPath().toString()).toList();
+            List<String> statesManifests = Arrays.stream(Objects.requireNonNull(projectStatesDir.toFile().listFiles())).filter(File::isDirectory).map(File::getName).toList();
             log.info(String.format("located '%d' state manifests: %s", statesManifests.size(), statesManifests));
         } catch (Exception ignored) {}
     }
