@@ -41,21 +41,6 @@ public class ClassImplementationFinder {
         return implementations;
     }
 
-    public static Set<String> findImplementations(String targetClass, File classesDir, FileCollection classpath) {
-        Map<String, ClassNode> classNodeCache = new HashMap<>();
-        Set<String> implementations = new HashSet<>();
-
-        // Load all class files from project and dependencies
-        if (classesDir.exists()) {
-            loadAllClassesFromDirectory(classesDir, classNodeCache);
-        }
-        loadAllClassesFromJars(classpath, classNodeCache);
-
-        // Scan the loaded class nodes
-        scanProjectClasses(targetClass, classesDir, classNodeCache, implementations);
-        return implementations;
-    }
-
     private static void loadAllClassesFromDirectory(File dir, Map<String, ClassNode> classNodeCache) {
         File[] files = dir.listFiles();
         if (files == null) return;
@@ -70,8 +55,7 @@ public class ClassImplementationFinder {
                     reader.accept(classNode, 0);
                     classNodeCache.put(classNode.name.replace("/", "."), classNode);
                 } catch (Exception e) {
-                    System.err.println("Failed to read class: " + file.getName());
-                    e.printStackTrace();
+                    log.error(String.format("Failed to read class: %s", file.getName()), e);
                 }
             }
         }
@@ -94,8 +78,7 @@ public class ClassImplementationFinder {
                         }
                     }
                 } catch (IOException e) {
-                    System.err.println("Failed to read JAR: " + jarFile.getName());
-                    e.printStackTrace();
+                    log.error(String.format("Failed to read JAR: %s", jarFile.getName()), e);
                 }
             }
         }
