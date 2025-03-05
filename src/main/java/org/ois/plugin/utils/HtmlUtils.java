@@ -14,10 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Utility class to handle HTML-specific functionalities for the OIS simulation.
@@ -53,8 +50,8 @@ public class HtmlUtils {
         Path projectBuildDir = SimulationUtils.getProjectBuildDirectory(project);
         FileCollection classpath = project.getConfigurations().getByName("runtimeClasspath");
         // Find State related implementation
-//        reflectionItems.addAll(ClassImplementationFinder.find(projectBuildDir, classpath, "org.ois.core.state.IState"));
-//        reflectionItems.addAll(ClassImplementationFinder.find(projectBuildDir, classpath, "org.ois.core.state.managed.StateBlueprint"));
+        reflectionItems.addAll(ClassImplementationFinder.find(projectBuildDir, classpath, "org.ois.core.state.IState"));
+        reflectionItems.addAll(ClassImplementationFinder.find(projectBuildDir, classpath, "org.ois.core.state.managed.StateBlueprint"));
         // Find Entity related implementation
         reflectionItems.addAll(ClassImplementationFinder.find(projectBuildDir, classpath,"org.ois.core.entities.Entity"));
         reflectionItems.addAll(ClassImplementationFinder.find(projectBuildDir, classpath,"org.ois.core.entities.EntityBlueprint"));
