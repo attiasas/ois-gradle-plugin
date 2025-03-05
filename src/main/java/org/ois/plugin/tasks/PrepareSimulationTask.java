@@ -14,7 +14,6 @@ import org.ois.core.utils.io.FileUtils;
 import org.ois.core.utils.io.data.formats.JsonFormat;
 import org.ois.plugin.Const;
 import org.ois.plugin.PluginConfiguration;
-import org.ois.plugin.entities.ProjectEntities;
 import org.ois.plugin.tools.IconHandler;
 import org.ois.plugin.tools.FileContentReplacer;
 import org.ois.plugin.utils.*;
@@ -28,15 +27,12 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Make sure the needed components for the deployer are ready to be used for running/debugging/exporting the OIS project
  */
 public class PrepareSimulationTask extends DefaultTask {
     private static final Logger log = LoggerFactory.getLogger(PrepareSimulationTask.class);
-
-    private final ProjectEntities projectEntities = new ProjectEntities();
 
     /**
      * Prepare the components and environment for OIS simulation actions
