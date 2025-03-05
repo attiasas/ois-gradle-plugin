@@ -20,6 +20,9 @@ dependencies {
     implementation "org.ois:open-interactive-simulation-core:$coreVersion"
     implementation 'org.eclipse.jgit:org.eclipse.jgit:6.10.0.202406032230-r'
 
+    implementation 'org.ow2.asm:asm:9.5'
+    implementation 'org.ow2.asm:asm-tree:9.5'
+
     testImplementation group: 'org.testng', name: 'testng', version: '7.7.0'
 }
 
