@@ -10,7 +10,7 @@ plugins {
     id 'org.ois.simulation' version '0.1-SNAPSHOT'
 }
 
-group = 'org.ois'
+group = 'org.ois.example'
 version = '0.0.1'
 ext {
     versionCode = 1
