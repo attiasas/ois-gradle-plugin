@@ -12,9 +12,6 @@ plugins {
 
 group = 'org.ois.example'
 version = '0.0.1'
-ext {
-    versionCode = 1
-}
 
 // This must be at least 11, and no higher than the JDK version this project is built with.
 java.targetCompatibility = "11"
