@@ -11,7 +11,7 @@ plugins {
 }
 
 group = 'org.ois.example'
-version = '0.0.1'
+version = '1.0.0'
 ext {
     versionCode = 1
 }

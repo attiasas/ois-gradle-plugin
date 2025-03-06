@@ -10,9 +10,8 @@ plugins {
     id 'org.ois.simulation' version '0.1-SNAPSHOT'
 }
 
-
 group = 'org.ois'
-version = '0.0.1'
+version = '1.0.0'
 
 // This must be at least 11, and no higher than the JDK version this project is built with.
 java.targetCompatibility = "11"
