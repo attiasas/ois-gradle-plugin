@@ -11,7 +11,7 @@ plugins {
 }
 
 
-group = 'org.ois'
+group = 'org.ois.example'
 version = '1.0.0'
 
 // This must be at least 11, and no higher than the JDK version this project is built with.
