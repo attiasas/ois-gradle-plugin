@@ -12,11 +12,12 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  export-state-example-project:
+  export-project:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
+        project: [state-example, entities-example]
         coreBranch: [entities]  # Adjust branches/tags as needed
 
     steps:
@@ -53,19 +54,19 @@ jobs:
           fi
         shell: bash
 
-      - name: Run Export Task
+      - name: Run Export Task for ${{ matrix.project }}
         run: |
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            ./gradlew.bat -p src\\test\\resources\\projects\\state-example export --info
+            ./gradlew.bat -p src\\test\\resources\\projects\\${{ matrix.project }} export --info
           else
-            ./gradlew -p src/test/resources/projects/state-example export --info
+            ./gradlew -p src/test/resources/projects/${{ matrix.project }} export --info
           fi
         shell: bash
 
       - name: Check Files in Distribution Directories with Minimum Count
         run: |
           # Base path for directories to check
-          base_dir="src/test/resources/projects/state-example/build/ois/distribution"
+          base_dir="src/test/resources/projects/${{ matrix.project }}/build/ois/distribution"
           
           # Define directory names with required minimum count (format: "dir_name:exact_count")
           # Root items: 1 jar, 2 dirs (Html, Desktop)

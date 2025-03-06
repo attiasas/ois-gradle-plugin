@@ -1,0 +1,14 @@
+{
+	"title": "Simulation Title",
+	"initialState": "EntitiesState",
+	"states": {
+		"EntitiesState": "org.ois.example.EntitiesState"
+	},
+	"runner": {
+		"platforms": [
+			"Desktop",
+			"Html",
+			"Android"
+		]
+	}
+}
