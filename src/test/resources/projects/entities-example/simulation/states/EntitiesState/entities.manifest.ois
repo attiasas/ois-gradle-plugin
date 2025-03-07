@@ -1,0 +1,17 @@
+{
+  "entities": [
+    { "type":  "circle", "color": { "r": 1 }, "radius": 50 },
+    { "type":  "circle", "color": { "r": 1 }, "radius": 100, "v": { "x": 5 } },
+    { "type":  "circle", "color": { "r": 1 }, "radius": 20,  "v": { "x": -1, "y": -1 } },
+    { "type":  "rect", "color": { "g": 1 }, "x": -500, "y": 500, "width": 80, "height": 80, "v": { "y": 1 } },
+    { "type":  "rect", "color": { "r": 1, "g": 1,"b": 1 }, "x": 500, "y": -500, "width": 100, "height": 60 },
+    { "type":  "circle", "radius": 50 },
+    { "type":  "circle", "radius": 50 },
+    { "type":  "circle", "radius": 50 },
+    { "type":  "circle", "radius": 50 },
+    { "type":  "circle", "radius": 50 },
+    { "type":  "circle", "radius": 50 },
+    { "type":  "circle", "radius": 50 },
+    { "type":  "circle", "radius": 50 }
+  ]
+}

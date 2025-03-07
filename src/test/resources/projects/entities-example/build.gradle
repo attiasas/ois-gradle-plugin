@@ -10,8 +10,11 @@ plugins {
     id 'org.ois.simulation' version '0.1-SNAPSHOT'
 }
 
-group = 'org.ois'
+group = 'org.ois.example'
 version = '1.0.0'
+ext {
+    versionCode = 1
+}
 
 // This must be at least 11, and no higher than the JDK version this project is built with.
 java.targetCompatibility = "11"
@@ -25,6 +28,6 @@ repositories {
 
 //simulation {
 //    runner {
-//        runnerVersion = "dev_mode"
+//        runnerVersion = "entities"
 //    }
 //}

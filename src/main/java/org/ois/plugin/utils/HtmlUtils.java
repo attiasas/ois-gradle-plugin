@@ -1,6 +1,10 @@
 package org.ois.plugin.utils;
 
 import org.gradle.api.Project;
+import org.gradle.api.file.FileCollection;
+import org.ois.core.utils.io.data.DataNode;
+import org.ois.core.utils.io.data.formats.JsonFormat;
+import org.ois.plugin.tools.ClassImplementationFinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,9 +13,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Utility class to handle HTML-specific functionalities for the OIS simulation.
@@ -36,12 +39,26 @@ public class HtmlUtils {
      * @throws IOException if an I/O error occurs while reading the file.
      */
     public static String generateReflectionFileContent(Project project) throws IOException {
+        Set<String> reflectionItems = new HashSet<>();
         // check if exists
         Path reflectionItemsFilePath = getReflectionsItemsFilePath(project);
         if (reflectionItemsFilePath.toFile().exists()) {
-            return Files.readString(reflectionItemsFilePath);
+            for (DataNode reflectionItem : JsonFormat.compact().deserialize(Files.readString(reflectionItemsFilePath))) {
+                reflectionItems.add(reflectionItem.getString());
+            }
         }
-        return "";
+        Path projectBuildDir = SimulationUtils.getProjectBuildDirectory(project);
+        FileCollection classpath = project.getConfigurations().getByName("runtimeClasspath");
+        // Find State related implementation
+        reflectionItems.addAll(ClassImplementationFinder.find(projectBuildDir, classpath, "org.ois.core.state.IState"));
+        reflectionItems.addAll(ClassImplementationFinder.find(projectBuildDir, classpath, "org.ois.core.state.managed.StateBlueprint"));
+        // Find Entity related implementation
+        reflectionItems.addAll(ClassImplementationFinder.find(projectBuildDir, classpath,"org.ois.core.entities.Entity"));
+        reflectionItems.addAll(ClassImplementationFinder.find(projectBuildDir, classpath,"org.ois.core.entities.EntityBlueprint"));
+        if (reflectionItems.isEmpty()) {
+            return "";
+        }
+        return JsonFormat.humanReadable().serialize(DataNode.Collection(reflectionItems));
     }
 
     /**
