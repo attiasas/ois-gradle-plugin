@@ -1,0 +1,6 @@
+{
+  "blueprint-class": "org.ois.example.blueprints.EntitiesStateBlueprint",
+  "components": {
+    "reloadState": { "after": 5, "loop": true }
+  }
+}
