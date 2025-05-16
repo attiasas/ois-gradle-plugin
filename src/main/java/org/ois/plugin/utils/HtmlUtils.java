@@ -56,7 +56,7 @@ public class HtmlUtils {
         reflectionItems.addAll(ClassImplementationFinder.find(projectBuildDir, classpath,"org.ois.core.entities.Entity"));
         reflectionItems.addAll(ClassImplementationFinder.find(projectBuildDir, classpath,"org.ois.core.project.blueprints.EntityBlueprint"));
         // Find Component related implementation
-        reflectionItems.addAll(ClassImplementationFinder.find(projectBuildDir, classpath,"org.ois.core.components.Component"));
+        reflectionItems.addAll(ClassImplementationFinder.find(projectBuildDir, classpath,"org.ois.core.components.IComponent"));
         reflectionItems.addAll(ClassImplementationFinder.find(projectBuildDir, classpath,"org.ois.core.project.blueprints.ComponentBlueprint"));
         if (reflectionItems.isEmpty()) {
             return "";
