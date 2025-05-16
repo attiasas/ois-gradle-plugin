@@ -2,7 +2,7 @@
 	"title": "Simulation Title",
 	"initialState": "EntitiesState",
 	"states": {
-		"EntitiesState": "org.ois.example.EntitiesState"
+		"EntitiesState": "org.ois.core.state.managed.ManagedState"
 	},
 	"runner": {
 		"platforms": [

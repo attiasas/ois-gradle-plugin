@@ -1,3 +1,7 @@
 {
-   "class": "org.ois.example.entities.Circle"
+   "type": "circle",
+   "blueprint-class": "org.ois.example.blueprints.ShapeEntityBlueprint",
+   "components": {
+      "render": { "color": "green" }
+   }
 }

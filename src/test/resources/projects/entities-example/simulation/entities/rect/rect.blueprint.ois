@@ -1,4 +1,7 @@
 {
-  "class": "org.ois.example.entities.Rect",
-  "blueprint-class": "org.ois.example.entities.RectBlueprint"
+   "type": "rect",
+   "blueprint-class": "org.ois.example.blueprints.ShapeEntityBlueprint",
+   "components": {
+      "render": { "color": { "r": 1 } }
+   }
 }
